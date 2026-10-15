@@ -12,6 +12,7 @@
         <input class="theme" style="background-color: #fcd34d" type="button" value="{{ labels.amber + (theme === 'amber' ? ' *' : '') }}" onclick="chooseTheme('amber')" />
       </div>
       <text class="status" onclick="retrySave">{{ status }}</text>
+      <input class="probe" type="button" value="{{ labels.backgroundProbe }}" onclick="openProbe" />
       <text class="hint">{{ labels.returnHint }}</text>
     </div>
   </div>
@@ -74,6 +75,12 @@ export default {
     if (next === this.theme) { this._store.retry(); return }
     this._store.update({ theme: next })
   },
+  openProbe() {
+    if (!this.controlsReady()) return
+    this._navigating = true
+    try { router.push({ uri: '/pages/probe', params: { ___PARAM_LAUNCH_FLAG___: 'clearTask' } }) }
+    catch (error) { this._navigating = false; console.warn('Could not open background test') }
+  },
   retrySave() { if (this.controlsReady()) this._store.retry() },
   onPageTouchStart(event) { this._swipe.start(event) },
   onPageTouchMove(event) { this._swipe.move(event) },
@@ -100,6 +107,7 @@ export default {
 .title { width: 280px; height: 32px; color: #f1f5f9; font-size: 24px; text-align: center; }
 .row { width: 280px; height: 128px; flex-direction: row; justify-content: space-between; }
 .theme { width: 128px; height: 128px; flex-shrink: 0; border-radius: 24px; color: #222222; font-size: 20px; }
+.probe { width: 280px; height: 40px; flex-shrink: 0; border-radius: 14px; background-color: #243041; color: #f1f5f9; font-size: 18px; }
 .status { width: 280px; height: 24px; color: #a8b5c5; font-size: 16px; text-align: center; }
 .hint { width: 280px; height: 22px; color: #a8b5c5; font-size: 16px; text-align: center; }
 </style>

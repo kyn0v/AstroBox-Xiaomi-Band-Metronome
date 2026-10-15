@@ -19,8 +19,8 @@ npm test
 npm run build
 ```
 
-Current identity: `org.bandmetronome.app`, version **0.5.11**, version code **19**.
-Output: `dist/org.bandmetronome.app.debug.0.5.11.rpk`.
+Current identity: `org.bandmetronome.app`, version **0.6.0-beta.1**, version code **20** (device-test beta).
+Output: `dist/org.bandmetronome.app.debug.0.6.0-beta.1.rpk`.
 
 This is a debug **application package, not firmware**, signed with the toolkit's
 shared development key. There are no runtime npm dependencies in the app; npm
@@ -82,8 +82,10 @@ Chinese translations. Update both languages together.
 
 | Path | Responsibility |
 | --- | --- |
-| `src/app.ux` | App-owned preference store |
+| `src/app.ux` | App-owned preference store and diagnostic lifecycle |
 | `src/common/metronome.js` | Meter-aware beat scheduler |
+| `src/common/background-probe.js` | Opt-in, five-minute app-owned diagnostic session and report |
+| `src/pages/probe/index.ux` | Background probe controls and explicitly foreground dark mode |
 | `src/common/rhythm.js` | Meters and normalized per-meter patterns |
 | `src/common/tap-tempo.js` | Tap estimator, 50–250 BPM |
 | `src/common/preferences.js` | Validation, subscriptions, serialized writes and retry status |
@@ -175,6 +177,40 @@ hardware brightness. Position dots continue when Flash is disabled.
 
 These are application-level choices, not a guarantee about every firmware's
 native gesture arbitration. There are no permanent Exit/Back buttons.
+
+## Background diagnostic (0.6.0-beta.1)
+
+This is a feasibility probe, not a supported background service. No background
+feature is declared: vibration and JS timers are not among the documented
+qualifying features. Do not add silent audio, unrelated location subscriptions or
+fake downloads to keep the process alive.
+
+The app owns the diagnostic timer and platform imports. The experimental page is
+entered with the documented `___PARAM_LAUNCH_FLAG___: 'clearTask'`, so root back
+can be handled by the system instead of returning to another internal page. It
+does not call `app.terminate()` on that test path. The system may still destroy or
+suspend the runtime. App destruction stops the test; returning to normal Home also
+stops any retained test, preventing two simultaneous vibration engines.
+
+Normal Home behavior is unchanged. The test uses a snapshot of its tempo, meter
+and per-beat pattern, requires vibration and at least one non-silent beat, and must
+be started explicitly. It has a five-minute wall-clock cap and stops before any
+new motor call after a gap larger than max(1500 ms, three slot intervals), or after
+a backward clock change. This guard executes only when JS runs; it cannot wake a
+suspended application. Already-started hardware pulses cannot be cancelled.
+
+Page hiding detaches view listeners, but only app-level `onHide` increments the
+app-hide counter. Hidden callback counts are diagnostic JS observations, not
+motor telemetry or proof of supported background operation. Reports are saved at
+lifecycle boundaries, not on every beat, through serialized writes under the
+separate `metronome.background-probe.v1` key. A stored `running` marker becomes
+`interrupted` on a new runtime and never resumes. Process destruction may prevent
+an asynchronous final write, so incomplete reports must remain inconclusive.
+
+Dark mode only paints a black foreground page while holding screen-on. It does
+not change hardware brightness or claim to save power. All controls and the
+warning/report vocabulary are localized. Unit tests simulate lifecycle and timer
+behavior, not OS scheduling or motor execution. See the [device-test guide](background-probe.md).
 
 ## Persistence and package migration
 
@@ -273,5 +309,7 @@ build tools or remove advisories. Use trusted projects and archives.
 - [Touch/swipe events](https://iot.mi.com/vela/quickapp/zh/components/general/events.html)
 - [Page lifecycle and system back](https://iot.mi.com/vela/quickapp/zh/guide/framework/script/lifecycle.html)
 - [Vibration support](https://iot.mi.com/vela/quickapp/zh/features/system/vibrator.html)
+- [Background execution conditions](https://iot.mi.com/vela/quickapp/zh/guide/framework/other/background-running.html)
+- [Router and clearTask](https://iot.mi.com/vela/quickapp/zh/features/basic/router.html)
 - [Storage](https://iot.mi.com/vela/quickapp/zh/features/data/storage.html)
 - [AstroBox resource guidelines](https://github.com/AstralSightStudios/AstroBox-Repo/blob/main/assets/docs/ResAdptV2.md)

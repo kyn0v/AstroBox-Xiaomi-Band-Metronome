@@ -2,8 +2,8 @@
   "package": "org.bandmetronome.app",
   "name": "Metronome",
   "icon": "/common/icon.png",
-  "versionName": "0.5.11",
-  "versionCode": 19,
+  "versionName": "0.6.0-beta.1",
+  "versionCode": 20,
   "minAPILevel": 1,
   "deviceTypeList": ["watch"],
   "features": [
@@ -29,6 +29,9 @@
         "component": "index"
       },
       "pages/appearance": {
+        "component": "index"
+      },
+      "pages/probe": {
         "component": "index"
       },
       "pages/rhythm": {

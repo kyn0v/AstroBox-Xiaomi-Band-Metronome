@@ -3,6 +3,7 @@ const fs = require('node:fs')
 const path = require('node:path')
 const vm = require('node:vm')
 const timing = require('../src/common/metronome')
+const probe = require('../src/common/background-probe')
 
 function fakeClock() {
   let now = 0
@@ -44,19 +45,27 @@ function fakeClock() {
 function pageHarness({
   preferences = {}, locale = 'en', keepScreenFails = false,
   vibrationFails = false, deferLoad = false, deferSaves = false, saveFails = false,
-  terminateFails = false
+  terminateFails = false, probeReport = ''
 } = {}) {
   const clock = fakeClock()
-  const calls = { keepScreenOn: [], vibrations: [], routes: [], writes: [], exits: 0, exitTimerCounts: [] }
+  const calls = { keepScreenOn: [], vibrations: [], routes: [], routeOptions: [], writes: [], probeWrites: [], exits: 0, exitTimerCounts: [] }
   let stored = JSON.stringify(Object.assign({ onboardingDone: true }, preferences))
+  let probeStored = probeReport ? JSON.stringify(probeReport) : ''
   let pendingLoad
   const pendingSaves = []
   const storage = {
     get(options) {
+      if (options.key === probe.PROBE_STORAGE_KEY) { options.success(probeStored); return }
       if (deferLoad) pendingLoad = options
       else options.success(stored)
     },
     set(options) {
+      if (options.key === probe.PROBE_STORAGE_KEY) {
+        calls.probeWrites.push(JSON.parse(options.value))
+        if (saveFails) options.fail()
+        else { probeStored = options.value; options.success() }
+        return
+      }
       calls.writes.push(JSON.parse(options.value))
       if (deferSaves) pendingSaves.push(options)
       else if (saveFails) options.fail()
@@ -86,10 +95,13 @@ function pageHarness({
     },
     '@system.configuration': { getLocale: () => ({ language: locale }) },
     '@system.router': {
-      push(options) { calls.routes.push(options.uri) },
+      push(options) { calls.routes.push(options.uri); calls.routeOptions.push(options) },
+      replace(options) { calls.routes.push(options.uri); calls.routeOptions.push(options) },
       back() { calls.routes.push('back') }
     },
     './common/preferences': require('../src/common/preferences'),
+    './common/background-probe': probe,
+    '../../common/probe-strings': require('../src/common/probe-strings'),
     '../../common/strings': require('../src/common/strings'),
     '../../common/themes': require('../src/common/themes'),
     '../../common/rhythm': require('../src/common/rhythm'),
@@ -132,7 +144,8 @@ function pageHarness({
   }
   const page = createPage('index')
   return {
-    page, clock, calls, createPage,
+    page, app, clock, calls, createPage,
+    probeStored: () => probeStored ? JSON.parse(probeStored) : null,
     setLocale(value) { locale = value },
     stored: () => JSON.parse(stored),
     pendingSaves: () => pendingSaves.length,

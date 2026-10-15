@@ -1,0 +1,182 @@
+<template>
+  <div class="page" style="background-color: {{ dark ? '#000000' : colors.background }}" ontouchstart="onPageTouchStart" ontouchmove="onPageTouchMove" ontouchend="onPageTouchEnd">
+    <div class="dark" if="{{ dark }}" onclick="wake">
+      <text class="wake">{{ labels.wake }}</text>
+    </div>
+    <div class="content" if="{{ !dark }}">
+      <text class="title">{{ labels.title }}</text>
+      <text class="warning">{{ labels.warning }}</text>
+      <text class="tempo" style="color: {{ colors.accent }}">{{ tempoText }}</text>
+      <text class="status">{{ status }}</text>
+      <div class="report">
+        <text class="detail">{{ callbacksText }}</text>
+        <text class="detail">{{ hidesText }}</text>
+        <text class="detail">{{ gapText }}</text>
+        <text class="note">{{ labels.note }}</text>
+      </div>
+      <div class="row">
+        <input class="button" style="background-color: {{ colors.accent }}" type="button" value="{{ running ? labels.stop : labels.start }}" disabled="{{ !ready }}" onclick="toggleRunning" />
+        <input class="button secondary" type="button" value="{{ labels.dim }}" disabled="{{ !running }}" onclick="enterDark" />
+      </div>
+      <input class="wide secondary" type="button" value="{{ labels.leave }}" disabled="{{ !running }}" onclick="tryLeave" />
+      <input class="wide secondary" type="button" value="{{ labels.homeButton }}" onclick="goHome" />
+    </div>
+  </div>
+</template>
+
+<script>
+const router = require('@system.router')
+const configuration = require('@system.configuration')
+const { getProbeStrings } = require('../../common/probe-strings')
+const { getTheme } = require('../../common/themes')
+const { createPageSwipe } = require('../../common/page-swipe')
+
+export default {
+  private: {
+    ready: false, running: false, dark: false, colors: getTheme(),
+    labels: getProbeStrings('en'), status: '', tempoText: '',
+    callbacksText: '', hidesText: '', gapText: ''
+  },
+  onInit() {
+    this._visible = false
+    this._navigating = false
+    this._preferences = null
+    this._snapshot = null
+    this._errorKey = null
+    this._unsubscribeProbe = null
+    this._swipe = createPageSwipe(() => Date.now())
+    this._probe = this.$app.$def.getBackgroundProbe()
+    this._store = this.$app.$def.getPreferences()
+    this._unsubscribePrefs = this._store.subscribe(values => {
+      this._preferences = values
+      this.colors = getTheme(values.theme)
+      this.refresh()
+    })
+    this.refreshLanguage()
+  },
+  onShow() {
+    this._visible = true
+    this._navigating = false
+    this.dark = false
+    this._errorKey = null
+    this._swipe.cancel()
+    this.refreshLanguage()
+    if (this._unsubscribeProbe) this._unsubscribeProbe()
+    this._probe.setPageVisible(true)
+    this._unsubscribeProbe = this._probe.subscribe(value => { this._snapshot = value; this.refresh() })
+    this._probe.load(value => {
+      if (!this._visible) return
+      this._snapshot = value
+      this.refresh()
+    })
+    this._store.load(values => {
+      if (!this._visible || this._navigating) return
+      this._preferences = values
+      this.colors = getTheme(values.theme)
+      this.refresh()
+    })
+  },
+  refreshLanguage() {
+    let language = 'en'
+    try { language = configuration.getLocale().language } catch (error) {}
+    this.labels = getProbeStrings(language)
+    this.refresh()
+  },
+  onConfigurationChanged() { this.refreshLanguage() },
+  refresh() {
+    const state = this._snapshot
+    const report = state && state.report
+    this.ready = !!(this._preferences && state && state.loaded)
+    this.running = !!(state && state.running)
+    if (!this.running) this.dark = false
+    const values = report || this._preferences
+    this.tempoText = values ? values.bpm + ' BPM · ' + values.meter : ''
+    const reason = !this.ready ? 'loading' : this._errorKey || (report ? report.reason : 'idle')
+    this.status = this.labels[reason] || this.labels.idle
+    if (state && state.saveError) this.status = this.labels.saveError
+    else if (state && state.screenError && this.running) this.status = this.labels.screenError
+    this.callbacksText = this.labels.callbacks + ': ' + (report ? report.hiddenTicks + ' / ' + report.ticks : '0 / 0')
+    this.hidesText = this.labels.hides + ': ' + (report ? report.appHideCount : 0)
+    this.gapText = this.labels.gap + ': ' + (report ? (report.maxGapMs / 1000).toFixed(1) : '0.0') + ' s'
+  },
+  controlsReady() { return this.ready && this._visible && !this._navigating && this._swipe.canClick() },
+  toggleRunning() {
+    if (!this.controlsReady()) return
+    this._errorKey = null
+    if (this.running) this._probe.stop('manual')
+    else if (!this._probe.start(this._preferences)) this._errorKey = 'noVibration'
+    this._snapshot = this._probe.snapshot()
+    this.refresh()
+  },
+  enterDark() {
+    if (this.controlsReady() && this.running) this.dark = true
+  },
+  wake() {
+    if (this._visible && this._swipe.canClick()) this.dark = false
+  },
+  tryLeave(fromGesture) {
+    if (!this._visible || !this.running || (fromGesture !== true && !this.controlsReady())) return
+    this._probe.prepareLeave()
+    // The experiment is entered with clearTask. Let the system handle root back;
+    // do not call app.terminate(), fake a background feature, or claim success.
+    try { router.back() }
+    catch (error) {
+      this._probe.stop('manual')
+      this._errorKey = 'routeError'
+      this._snapshot = this._probe.snapshot()
+      this.refresh()
+    }
+  },
+  goHome(fromGesture) {
+    if (!this._visible || this._navigating || (fromGesture !== true && !this._swipe.canClick())) return
+    this._probe.stop('manual')
+    this.dark = false
+    this._navigating = true
+    try { router.replace({ uri: '/pages/index' }) }
+    catch (error) { this._navigating = false; this._errorKey = 'routeError'; this.refresh() }
+  },
+  onBackPress() {
+    if (this._navigating) return true
+    if (this.running) this._probe.prepareLeave()
+    return false
+  },
+  onPageTouchStart(event) { this._swipe.start(event) },
+  onPageTouchMove(event) { this._swipe.move(event) },
+  onPageTouchEnd(event) {
+    if (this._swipe.end(event) !== 'right') return
+    if (this.dark) { this.dark = false; return }
+    if (this.running) this.tryLeave(true)
+    else this.goHome(true)
+  },
+  onHide() {
+    this._visible = false
+    this._swipe.cancel()
+    if (this._unsubscribeProbe) this._unsubscribeProbe()
+    this._unsubscribeProbe = null
+    this._probe.setPageVisible(false)
+  },
+  onDestroy() {
+    this.onHide()
+    this._unsubscribePrefs()
+    this.ready = false
+  }
+}
+</script>
+
+<style>
+.page { width: 100%; height: 100%; }
+.content { width: 100%; height: 100%; padding: 16px; flex-direction: column; align-items: center; justify-content: space-between; }
+.title { width: 300px; height: 30px; color: #f1f5f9; font-size: 22px; text-align: center; }
+.warning { width: 300px; height: 46px; color: #fcd34d; font-size: 16px; text-align: center; }
+.tempo { width: 300px; height: 28px; font-size: 22px; text-align: center; }
+.status { width: 300px; height: 24px; color: #f1f5f9; font-size: 16px; text-align: center; }
+.report { width: 300px; height: 96px; flex-direction: column; }
+.detail { width: 300px; height: 24px; color: #c8d1dc; font-size: 16px; text-align: center; }
+.note { width: 300px; height: 24px; color: #a8b5c5; font-size: 15px; text-align: center; }
+.row { width: 300px; height: 44px; flex-direction: row; justify-content: space-between; }
+.button { width: 144px; height: 44px; flex-shrink: 0; border-radius: 16px; color: #222222; font-size: 18px; }
+.wide { width: 300px; height: 40px; flex-shrink: 0; border-radius: 14px; font-size: 18px; }
+.secondary { background-color: #243041; color: #f1f5f9; }
+.dark { width: 100%; height: 100%; padding-bottom: 32px; flex-direction: column; align-items: center; justify-content: flex-end; }
+.wake { width: 300px; height: 30px; color: #515965; font-size: 16px; text-align: center; }
+</style>

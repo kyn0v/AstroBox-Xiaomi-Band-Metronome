@@ -52,7 +52,7 @@ test('native picker excludes its bubbled touches from page navigation', () => {
 
 test('four focused pages omit exit/back buttons, global vibration modes, and reset', () => {
   const manifest = JSON.parse(fs.readFileSync(path.join(root, 'src/manifest.json'), 'utf8'))
-  assert.deepEqual(Object.keys(manifest.router.pages).sort(), ['pages/appearance', 'pages/index', 'pages/rhythm', 'pages/tempo'])
+  assert.deepEqual(Object.keys(manifest.router.pages).sort(), ['pages/appearance', 'pages/index', 'pages/probe', 'pages/rhythm', 'pages/tempo'])
   for (const route of Object.keys(manifest.router.pages)) {
     const source = fs.readFileSync(path.join(root, 'src', route, 'index.ux'), 'utf8')
     const template = source.split('<script>')[0]

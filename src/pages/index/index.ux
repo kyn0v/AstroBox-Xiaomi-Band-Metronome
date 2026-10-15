@@ -102,6 +102,8 @@ export default {
     }
   },
   onShow() {
+    // A retained diagnostic session must never overlap normal practice.
+    this.$app.$def.stopBackgroundProbe()
     this._visible = true
     this._navigating = false
     this._swipe.cancel()

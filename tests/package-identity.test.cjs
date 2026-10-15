@@ -21,5 +21,5 @@ test('public delivery instructions use a portable home directory, not an author 
     assert.doesNotMatch(text, /\/(?:Users|home)\/[^\s/]+\//)
     assert.doesNotMatch(text, /[A-Z]:\\Users\\/i)
   }
-  assert.ok(agents.includes('~/Library/Mobile Documents/com~apple~CloudDocs/MetronomeRpk/'))
+  assert.ok(agents.includes('~/Library/Mobile Documents/com~apple~CloudDocs/TempHub/'))
 })

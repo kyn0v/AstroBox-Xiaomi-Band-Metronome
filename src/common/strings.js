@@ -1,6 +1,7 @@
 // Follow the device locale; unsupported languages fall back to English.
 const en = {
   title: 'METRONOME', tempo: 'TEMPO', rhythm: 'RHYTHM', appearance: 'COLORS',
+  backgroundProbe: 'Background test (beta)',
   start: 'Start', stop: 'Stop', tap: 'Tap Tempo',
   tapRange: 'Use 50–250 BPM',
   tempoMinimum: 'Minimum: 50 BPM', tempoMaximum: 'Maximum: 250 BPM',
@@ -27,6 +28,7 @@ const en = {
 
 const zh = {
   title: '节拍器', tempo: '调整速度', rhythm: '节拍编排', appearance: '主题配色',
+  backgroundProbe: '后台试验（测试版）',
   start: '开始', stop: '停止', tap: '击拍测速',
   tapRange: '请使用 50–250 BPM',
   tempoMinimum: '最低 50 BPM', tempoMaximum: '最高 250 BPM',
