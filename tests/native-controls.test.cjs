@@ -50,16 +50,13 @@ test('native picker excludes its bubbled touches from page navigation', () => {
   }
 })
 
-test('normal practice pages stay focused, while all pages handle system back', () => {
+test('four foreground pages stay focused and handle system back', () => {
   const manifest = JSON.parse(fs.readFileSync(path.join(root, 'src/manifest.json'), 'utf8'))
-  assert.deepEqual(Object.keys(manifest.router.pages).sort(), ['pages/appearance', 'pages/capabilities', 'pages/index', 'pages/probe', 'pages/rhythm', 'pages/tempo'])
+  assert.deepEqual(Object.keys(manifest.router.pages).sort(), ['pages/appearance', 'pages/index', 'pages/rhythm', 'pages/tempo'])
   for (const route of Object.keys(manifest.router.pages)) {
     const source = fs.readFileSync(path.join(root, 'src', route, 'index.ux'), 'utf8')
     const template = source.split('<script>')[0]
-    // Diagnostic pages intentionally have explicit navigation/stop controls.
-    if (!['pages/probe', 'pages/capabilities'].includes(route)) {
-      assert.doesNotMatch(template, /onclick="(?:exitApp|goBack|resetTempo|toggleVibrationMode)"/)
-    }
+    assert.doesNotMatch(template, /onclick="(?:exitApp|goBack|resetTempo|toggleVibrationMode)"/)
     assert.match(source, /onBackPress\(/)
   }
   assert.doesNotMatch(tempoTemplate, /openAppearance|showGuide/)

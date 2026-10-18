@@ -1,3 +1,4 @@
+// Archived research helper; not imported by the foreground-only application.
 // Read-only device/capability inventory. No vibration/audio/GPS, library loading,
 // storage or network operations. A query result is not a background guarantee.
 // Platform objects and timers are injected for lifecycle control and tests.

@@ -44,6 +44,9 @@ SHAPES = {
         line(7, 10, 5, 13), line(5, 13, 7, 16), line(7, 16, 5, 19), line(5, 19, 7, 22),
         line(25, 10, 27, 13), line(27, 13, 25, 16), line(25, 16, 27, 19), line(27, 19, 25, 22)
     ],
+    # A crescent moon for foreground dark mode, using the same 32-unit canvas.
+    'dark': [lambda x, y: (x - 16) ** 2 + (y - 16) ** 2 <= 10 ** 2
+             and (x - 21) ** 2 + (y - 11) ** 2 >= 9 ** 2],
     'flash': [circle(16, 16, 5)] + [
         line(16 + 9 * math.cos(i * math.pi / 4), 16 + 9 * math.sin(i * math.pi / 4),
              16 + 13 * math.cos(i * math.pi / 4), 16 + 13 * math.sin(i * math.pi / 4))
@@ -97,8 +100,8 @@ OUTPUT.mkdir(parents=True, exist_ok=True)
 render_app_icon()
 for icon in ('play', 'stop'):
     render(icon + '-dark', SHAPES[icon], COLORS['dark'])
-for icon in ('vibration', 'flash'):
+for icon in ('vibration', 'dark', 'flash'):
     for theme, color in ACCENTS.items():
         render(icon + '-' + theme, SHAPES[icon], color)
     render(icon + '-off', SHAPES[icon] + [line(5, 27, 27, 5, 2.2)], COLORS['muted'])
-print('Generated transparent launcher icon and twelve control icons in', OUTPUT.parent)
+print('Generated transparent launcher icon and seventeen control icons in', OUTPUT.parent)

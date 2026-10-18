@@ -60,6 +60,7 @@ function createPageSwipe(now) {
       return null
     },
     canClick() { return !excluded && !(active && active.moved) && now() >= blockedUntil },
+    blockClicks() { blockedUntil = Math.max(blockedUntil, now() + 350) },
     cancel() { active = null; excluded = false; blockedUntil = 0 }
   }
 }

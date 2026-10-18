@@ -152,7 +152,7 @@ test('all four templates guard initial content, but leave the page/back gesture 
     const source = fs.readFileSync(path.join(__dirname, `../src/pages/${name}/index.ux`), 'utf8')
     const template = source.split('<script>')[0]
     assert.match(template, /class="loading" if="\{\{ !ready \}\}"/)
-    assert.match(template, name === 'index' ? /class="practice" if="\{\{ ready && !showWelcome \}\}"/ : /class="content" if="\{\{ ready \}\}"/)
+    assert.match(template, name === 'index' ? /class="practice" if="\{\{ ready && !showWelcome && !dark \}\}"/ : /class="content" if="\{\{ ready \}\}"/)
     assert.match(template, /<div class="page"[^>]*ontouchend="onPageTouchEnd"/)
   }
 })

@@ -1,6 +1,8 @@
 # Background metronome feasibility — Xiaomi Smart Band 9 Pro
 
-Research snapshot: **2026-10-18**. Related: [issue #1](https://github.com/kyn0v/astrobox-xiaomi-band-metronome/issues/1), [beta test guide](background-probe.md).
+Research snapshot: **2026-10-18**, with subsequent owner feedback noted below. Related: [issue #1](https://github.com/kyn0v/astrobox-xiaomi-band-metronome/issues/1), [historical beta test guide](background-probe.md).
+
+**Product decision for beta.3:** foreground-only practice with an integrated dark presentation. The experimental runtime and capability pages have been removed from the current RPK. The owner subsequently confirmed that only `vibrator.vibrate` reported support, not `start/stop`; exact firmware/runtime metadata and screenshots were not supplied. This agrees with the public restriction but remains a device-specific verbal observation, not a proof about all firmware. See [current foreground-dark controls](foreground-dark.md).
 
 ## 1. Decision summary
 
@@ -176,7 +178,7 @@ app.canIUse('@system.vibrator.start')
 
 `canIUse` itself is marked API Level 3+. Missing or throwing capability queries must be recorded as **query unavailable/error**, not as a definitive “unsupported.” A true result is also not proof of permission, background lifetime or successful hardware operation.
 
-The initial research prepared a dependency-injected, read-only helper with Node tests. It is now integrated in **0.6.0-beta.2** as [src/common/background-capabilities.js](../src/common/background-capabilities.js) and the [capability-check page](capability-check.md). It queries metadata, filters returned device fields and bounds the device-info callback wait. The page declares only `system.device` as an additional feature, handles hide/destruction and displays the filtered results locally. It does not start any service or native task, and there is no automatic report upload.
+The initial research prepared a dependency-injected, read-only helper with Node tests. It was integrated in **0.6.0-beta.2** as [the collector at commit 913c5ad](https://github.com/kyn0v/astrobox-xiaomi-band-metronome/blob/913c5ad/src/common/background-capabilities.js) and the [historical capability-check page](capability-check.md). It queried metadata, filtered returned device fields and bounded the device-info callback wait without starting a service or uploading results. In beta.3, the UI and `system.device` declaration are removed; the helper is kept only as a [tested research snippet](snippets/background-capabilities.js), outside the app source and RPK.
 
 The helper also queries `@system.timer`, `@system.alarm`, and `@system.notification` as explicitly **undocumented search candidates**, without importing or executing them. These query names do not assert that such Vela interfaces exist.
 
@@ -225,7 +227,7 @@ A supported implementation should not be claimed until the required interface is
 
 Local validation: **174 Node tests passed**, including six tests of the read-only capability helper (tri-state results, identifier filtering, callback timeout/cancellation and errors). These tests do not validate retail firmware behavior.
 
-The research-only phase did not change app behavior, manifest permissions or the signing workflow; it did not build an RPK, access/flash a device, install an extra host, purchase a paid item or post an external message. A subsequent owner-requested beta.2 integrates only the read-only inventory UI; that integration must not be confused with a successful background implementation. The original beta.1 device observation and the unresolved evidence boundaries above are unchanged.
+The research-only phase did not change app behavior, manifest permissions or the signing workflow; it did not build an RPK, access/flash a device, install an extra host, purchase a paid item or post an external message. The subsequent owner-requested beta.2 integrated only a read-only inventory UI; the owner reported that only `vibrator.vibrate` was supported. Beta.3 removes these diagnostics in favor of foreground dark practice. Neither change demonstrates a successful background implementation; full firmware identity and the exact beta.1 stop mechanism remain unresolved.
 
 ## Sources
 

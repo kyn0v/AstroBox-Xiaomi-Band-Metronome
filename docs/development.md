@@ -19,8 +19,8 @@ npm test
 npm run build
 ```
 
-Current identity: `org.bandmetronome.app`, version **0.6.0-beta.2**, version code **21** (device-test beta).
-Output: `dist/org.bandmetronome.app.debug.0.6.0-beta.2.rpk`.
+Current identity: `org.bandmetronome.app`, version **0.6.0-beta.3**, version code **22** (foreground-dark test build).
+Output: `dist/org.bandmetronome.app.debug.0.6.0-beta.3.rpk`.
 
 This is a debug **application package, not firmware**, signed with the toolkit's
 shared development key. There are no runtime npm dependencies in the app; npm
@@ -82,19 +82,14 @@ Chinese translations. Update both languages together.
 
 | Path | Responsibility |
 | --- | --- |
-| `src/app.ux` | App-owned preference store and diagnostic lifecycle |
+| `src/app.ux` | App-owned preference store |
 | `src/common/metronome.js` | Meter-aware beat scheduler |
-| `src/common/background-probe.js` | Opt-in, five-minute app-owned diagnostic session and report |
-| `src/pages/probe/index.ux` | Background probe controls and explicitly foreground dark mode |
-| `src/common/background-capabilities.js` | Read-only, filtered device and API metadata collection |
-| `src/common/capability-view.js` | Five-panel result formatting and long-value display |
-| `src/pages/capabilities/index.ux` | Read-only inventory, pagination, details and cancellation |
 | `src/common/rhythm.js` | Meters and normalized per-meter patterns |
 | `src/common/tap-tempo.js` | Tap estimator, 50–250 BPM |
 | `src/common/preferences.js` | Validation, subscriptions, serialized writes and retry status |
 | `src/common/page-swipe.js` | Four-direction touch observer and click suppression |
 | `src/common/themes.js` | Four palettes and pulse colors |
-| `src/pages/index/index.ux` | Practice and navigation |
+| `src/pages/index/index.ux` | Foreground practice, dark-mode presentation and navigation |
 | `src/pages/tempo/index.ux` | Native number picker and circular Tap Tempo |
 | `src/pages/rhythm/index.ux` | Meter selection and editable cells |
 | `src/pages/appearance/index.ux` | Theme swatches |
@@ -127,7 +122,9 @@ undocumented intensity APIs or extra delayed pulses to simulate stronger beats.
 
 Visual pulses last at most 100 ms and 40% of a slot, ending before the next slot.
 The main button changes color; the app does not flash the entire screen or vary
-hardware brightness. Position dots continue when Flash is disabled.
+hardware brightness. Position dots continue when Flash is disabled in the visible
+practice UI. In foreground dark mode, flashes and reactive beat-dot updates are
+suppressed without changing the scheduler or the saved Flash preference.
 
 ## UI lifecycle and navigation
 
@@ -181,67 +178,58 @@ hardware brightness. Position dots continue when Flash is disabled.
 These are application-level choices, not a guarantee about every firmware's
 native gesture arbitration. There are no permanent Exit/Back buttons.
 
-## Background diagnostic (0.6.0-beta.1)
+## Foreground dark practice (0.6.0-beta.3)
 
-This is a feasibility probe, not a supported background service. No background
-feature is declared: vibration and JS timers are not among the documented
-qualifying features. Do not add silent audio, unrelated location subscriptions or
-fake downloads to keep the process alive.
+The bottom action row is Vibration / Moon / Flash, with three equal 64 x 48 px
+hit areas. A theme-colored crescent indicates running/vibration state; a gray
+variant is shown otherwise. Tapping while stopped, muted or entirely silent gives
+a localized notice, never starts playback or enables vibration automatically.
 
-The app owns the diagnostic timer and platform imports. The experimental page is
-entered with the documented `___PARAM_LAUNCH_FLAG___: 'clearTask'`, so root back
-can be handled by the system instead of returning to another internal page. It
-does not call `app.terminate()` on that test path. The system may still destroy or
-suspend the runtime. App destruction stops the test; returning to normal Home also
-stops any retained test, preventing two simultaneous vibration engines.
+Dark mode is an opaque black alternative presentation of Home, not a new route,
+background service, screen-off API or hardware brightness change. The normal
+practice controls are conditionally unmounted so invisible controls cannot be
+activated. A small low-contrast hint explains tap-to-restore and right-swipe exit.
 
-Normal Home behavior is unchanged. The test uses a snapshot of its tempo, meter
-and per-beat pattern, requires vibration and at least one non-silent beat, and must
-be started explicitly. It has a five-minute wall-clock cap and stops before any
-new motor call after a gap larger than max(1500 ms, three slot intervals), or after
-a backward clock change. This guard executes only when JS runs; it cannot wake a
-suspended application. Already-started hardware pulses cannot be cancelled.
+The same page-owned metronome engine continues running. Entering dark mode clears
+pending flashes/notices; dark ticks update only a non-reactive last-beat field and
+the normal vibration output. On wake, that beat index is restored without an
+immediate motor pulse, scheduler restart or phase reset. Saved theme, Flash,
+vibration, meter and BPM values are not changed. Normal visible flashes resume
+on the next beat if enabled.
 
-Page hiding detaches view listeners, but only app-level `onHide` increments the
-app-hide counter. Hidden callback counts are diagnostic JS observations, not
-motor telemetry or proof of supported background operation. Reports are saved at
-lifecycle boundaries, not on every beat, through serialized writes under the
-separate `metronome.background-probe.v1` key. A stored `running` marker becomes
-`interrupted` on a new runtime and never resumes. Process destruction may prevent
-an asynchronous final write, so incomplete reports must remain inconclusive.
+A 350 ms click guard is applied both when entering and leaving dark mode. It uses
+the existing swipe controller without another timer, preventing the entry tap
+from immediately waking and the wake tap from activating remounted controls.
+Left/up/down gestures in dark mode only restore the UI. Right swipe and system
+back retain their stop/exit semantics, including during the click guard.
 
-Dark mode only paints a black foreground page while holding screen-on. It does
-not change hardware brightness or claim to save power. All controls and the
-warning/report vocabulary are localized. Unit tests simulate lifecycle and timer
-behavior, not OS scheduling or motor execution. See the [device-test guide](background-probe.md)
-and the [2026-10-18 feasibility research](background-research.md) for the device-specific
-API matrix, pinned native-source evidence, limits of the first device result,
-and the evidence boundaries for capability queries. That collector is now integrated
-in beta.2 as the separate read-only page described below.
+Stop, hide and destroy clear dark state, the beat scheduler and flash/notice
+timers, and release screen-on. Reopening never restarts or restores dark mode.
+Vibration, persistence and screen-on errors restore visible controls. A playback
+generation token prevents late screen-on failures from an earlier run corrupting
+a new run. No hardware brightness value/mode is changed, so there is no brightness
+setting to restore. Power savings are not asserted.
 
-## Read-only capability inventory (0.6.0-beta.2)
+There is no five-minute experimental cap: this uses normal foreground practice
+until stopped or the page is left. See the [foreground-dark acceptance guide](foreground-dark.md).
 
-The new Colors entry opens a normal routed page; it does not use clearTask or
-attempt to leave the app. It first stops any retained diagnostic vibration session.
-The collector calls only app.getInfo, app.canIUse when callable, and device.getInfo.
-The sole new manifest feature is system.device; no identifying permission or
-background feature is added. Known service names and explicitly unconfirmed
-candidate names are queried as strings, not imported or executed.
+## Retired diagnostics and research
 
-Device data is allowlisted to model/product, OS and runtime versions/codes, and
-APILevel. Only package/version metadata is retained from app.getInfo. Unique IDs,
-serials, accounts, location data and raw error messages are discarded. Control
-characters are removed; strings exceeding 120 characters are visibly shortened
-with `...`. Numeric failure codes may be displayed. Missing or throwing queries
-remain distinct from a reported false result.
+The beta.1 background probe and beta.2 capability pages, engine, strings and
+`system.device` declaration are removed from the active app in beta.3. The
+application returns to four foreground pages and has no app-owned background
+scheduler. Existing diagnostic storage, if present from an old beta, is not read,
+resumed or transmitted; normal preferences keep their existing key and schema.
 
-Five fixed panels have at most four rows each. Long values can be opened in a
-larger detail view. Results are held only in page-instance memory, not stored or
-uploaded. A three-second timeout bounds device.getInfo; hide/destroy and back
-navigation cancel pending callbacks. A generation guard rejects stale responses,
-and retained completed results do not get re-read just for pagination or a brief
-hide/show. Normal metronome behavior and the previous experiment are unchanged.
-See the [capability-check guide](capability-check.md) for device acceptance.
+The owner's follow-up reports that only `vibrator.vibrate` was supported, not the
+repeat-task APIs. Full firmware metadata was not supplied, so this conclusion is
+limited to the reported device and tested route. Keep the [research report](background-research.md),
+[historical beta.1 guide](background-probe.md) and [historical beta.2 guide](capability-check.md)
+for evidence rather than exposing unsupported features in the current UI. The
+read-only collector is retained as a tested [research snippet](snippets/background-capabilities.js),
+outside src and outside the RPK. The complete historical implementations remain
+in Git history. No background feature or unsupported API should be added merely
+because a native upstream implementation exists.
 
 ## Persistence and package migration
 

@@ -1,7 +1,7 @@
 const test = require('node:test')
 const assert = require('node:assert/strict')
 const { fakeClock } = require('./helpers.cjs')
-const { collectBackgroundCapabilities, QUERIES } = require('../src/common/background-capabilities')
+const { collectBackgroundCapabilities, QUERIES } = require('../docs/snippets/background-capabilities')
 
 test('read-only capability helper preserves supported/unsupported/unknown distinctions', () => {
   const clock = fakeClock(), queried = []

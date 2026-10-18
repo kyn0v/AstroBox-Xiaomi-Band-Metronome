@@ -2,8 +2,8 @@
   "package": "org.bandmetronome.app",
   "name": "Metronome",
   "icon": "/common/icon.png",
-  "versionName": "0.6.0-beta.2",
-  "versionCode": 21,
+  "versionName": "0.6.0-beta.3",
+  "versionCode": 22,
   "minAPILevel": 1,
   "deviceTypeList": ["watch"],
   "features": [
@@ -12,8 +12,7 @@
     { "name": "system.storage" },
     { "name": "system.configuration" },
     { "name": "system.router" },
-    { "name": "system.app" },
-    { "name": "system.device" }
+    { "name": "system.app" }
   ],
   "config": {
     "designWidth": 336,
@@ -30,12 +29,6 @@
         "component": "index"
       },
       "pages/appearance": {
-        "component": "index"
-      },
-      "pages/probe": {
-        "component": "index"
-      },
-      "pages/capabilities": {
         "component": "index"
       },
       "pages/rhythm": {

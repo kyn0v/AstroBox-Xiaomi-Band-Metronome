@@ -1,7 +1,11 @@
 <template>
-  <div class="page" style="background-color: {{ colors.background }}" ontouchstart="onPageTouchStart" ontouchmove="onPageTouchMove" ontouchend="onPageTouchEnd">
+  <div class="page" style="background-color: {{ dark ? '#000000' : colors.background }}" ontouchstart="onPageTouchStart" ontouchmove="onPageTouchMove" ontouchend="onPageTouchEnd">
     <div class="loading" if="{{ !ready }}"><text class="hint">{{ labels.loading }}</text></div>
-    <div class="welcome" if="{{ ready && showWelcome }}">
+    <div class="dark-screen" if="{{ dark }}" onclick="wakeFromDark">
+      <text class="dark-hint">{{ labels.darkWake }}</text>
+      <text class="dark-hint">{{ labels.darkExit }}</text>
+    </div>
+    <div class="welcome" if="{{ ready && showWelcome && !dark }}">
       <text class="welcome-title" style="color: {{ colors.accent }}">{{ labels.welcome }}</text>
       <text class="welcome-subtitle">{{ labels.welcomeSubtitle }}</text>
       <text class="guide">{{ labels.swipeLeft }}</text>
@@ -11,7 +15,7 @@
       <text class="guide-detail">{{ labels.quickGuide }}</text>
       <input class="welcome-button" style="background-color: {{ colors.accent }}" type="button" value="{{ labels.letsPlay }}" onclick="finishWelcome" />
     </div>
-    <div class="practice" if="{{ ready && !showWelcome }}">
+    <div class="practice" if="{{ ready && !showWelcome && !dark }}">
       <text class="meter" style="color: {{ colors.accent }}" onclick="openRhythm" onlongpress="showGuide">{{ meter }}</text>
       <div class="tempo" onclick="openTempo">
         <text class="bpm">{{ bpm }}</text>
@@ -24,6 +28,9 @@
       <div class="quick-row">
         <div class="quick" onclick="toggleVibration">
           <image class="quick-icon" src="{{ vibration ? '/common/icons/vibration-' + theme + '.png' : '/common/icons/vibration-off.png' }}"></image>
+        </div>
+        <div class="quick" onclick="enterDark">
+          <image class="quick-icon" src="{{ running && vibration ? '/common/icons/dark-' + theme + '.png' : '/common/icons/dark-off.png' }}"></image>
         </div>
         <div class="quick" onclick="toggleFlash">
           <image class="quick-icon" src="{{ flash ? '/common/icons/flash-' + theme + '.png' : '/common/icons/flash-off.png' }}"></image>
@@ -49,7 +56,7 @@ const { createPageSwipe } = require('../../common/page-swipe')
 export default {
   private: {
     bpm: timing.DEFAULT_BPM, meter: '4/4', beatSlots: [0, 1, 2, 3], currentBeat: -1,
-    ready: false, running: false, showWelcome: false,
+    ready: false, running: false, showWelcome: false, dark: false,
     vibration: true, flash: true, lit: false, theme: 'mint', colors: getTheme(),
     labels: getStrings('en'), status: 'Loading preferences...'
   },
@@ -60,6 +67,9 @@ export default {
     this._noticeTimer = null
     this._noticeKey = null
     this._keepScreenRequested = false
+    this._screenFailed = false
+    this._runGeneration = 0
+    this._lastBeat = -1
     this._statusKey = 'loading'
     this._pattern = defaultPattern('4/4')
     this._swipe = createPageSwipe(() => Date.now())
@@ -91,6 +101,7 @@ export default {
     }
     if (!previous || previous.onboardingDone !== values.onboardingDone) this.showWelcome = !values.onboardingDone
     this._preferences = values
+    if (this.dark && (!this.vibration || this._pattern.every(mode => mode === 'off') || this.showWelcome)) this.wakeFromDark(true)
     this.syncSaveStatus()
     if (!this.ready) this.ready = true
   },
@@ -102,8 +113,7 @@ export default {
     }
   },
   onShow() {
-    // A retained diagnostic session must never overlap normal practice.
-    this.$app.$def.stopBackgroundProbe()
+    this.dark = false
     this._visible = true
     this._navigating = false
     this._swipe.cancel()
@@ -117,7 +127,7 @@ export default {
       this.syncSaveStatus()
     })
   },
-  controlsReady() { return this.ready && this._visible && !this.showWelcome && !this._navigating },
+  controlsReady() { return this.ready && this._visible && !this.showWelcome && !this.dark && !this._navigating },
   finishWelcome() {
     if (!this.ready || !this._visible || this._navigating || !this.showWelcome || !this._swipe.canClick()) return
     this.showWelcome = false
@@ -138,7 +148,10 @@ export default {
   onConfigurationChanged(event) { if (event && event.type === 'locale') this.refreshLanguage() },
   setStatus(key) {
     this._statusKey = key
-    if (key.indexOf('Error') >= 0) this.clearNotice()
+    if (key.indexOf('Error') >= 0) {
+      this.clearNotice()
+      if (this.dark) this.wakeFromDark(true)
+    }
     this.status = this.labels[this._noticeKey || key]
   },
   clearNotice() {
@@ -158,7 +171,7 @@ export default {
   },
   persist(patch) { this._store.update(patch) },
   retrySave() {
-    if (this.ready && this._visible && !this._navigating && this._swipe.canClick()) this._store.retry()
+    if (this.ready && this._visible && !this.dark && !this._navigating && this._swipe.canClick()) this._store.retry()
   },
   onPageTouchStart(event) { this._swipe.start(event) },
   onPageTouchMove(event) { this._swipe.move(event) },
@@ -168,6 +181,11 @@ export default {
   },
   onPageSwipe(event) {
     if (!event || !this._visible) return
+    if (this.dark) {
+      if (event.direction === 'right') this.exitApp(true)
+      else if (['left', 'up', 'down'].indexOf(event.direction) >= 0) this.wakeFromDark(true)
+      return
+    }
     if (event.direction === 'right') this.exitApp(true)
     else if (event.direction === 'left') this.openTempo(true)
     else if (event.direction === 'up') this.openRhythm(true)
@@ -192,13 +210,37 @@ export default {
     this.running = true
     this.setStatus('running')
     this._keepScreenRequested = true
-    try {
-      brightness.setKeepScreenOn({
-        keepScreenOn: true,
-        fail: () => { if (this.running) this.setStatus('screenError') }
-      })
-    } catch (error) { this.setStatus('screenError') }
+    this._screenFailed = false
+    const generation = ++this._runGeneration
+    const screenFailed = () => {
+      if (generation !== this._runGeneration || !this.running || !this._visible) return
+      this._screenFailed = true
+      this.setStatus('screenError')
+    }
+    try { brightness.setKeepScreenOn({ keepScreenOn: true, fail: screenFailed }) }
+    catch (error) { screenFailed() }
     this._metronome.start()
+  },
+  enterDark() {
+    if (!this.controlsReady() || !this._swipe.canClick()) return
+    if (!this.running) { this.notify('darkStartFirst'); return }
+    if (!this.vibration) { this.notify('darkVibrationFirst'); return }
+    if (this._pattern.every(mode => mode === 'off')) { this.notify('darkBeatFirst'); return }
+    if (this._screenFailed) { this.setStatus('screenError'); return }
+    this.clearFlash()
+    this.clearNotice()
+    this.status = this.labels[this._statusKey]
+    this.dark = true
+    // Prevent the activating tap from immediately waking the newly shown page.
+    this._swipe.blockClicks()
+  },
+  wakeFromDark(fromGesture) {
+    if (!this.dark || !this._visible || this._navigating || (fromGesture !== true && !this._swipe.canClick())) return
+    this.dark = false
+    this.currentBeat = this._lastBeat
+    this.clearFlash()
+    // A wake tap must not also activate a control newly mounted under the finger.
+    this._swipe.blockClicks()
   },
   toggleVibration() {
     if (!this.controlsReady() || !this._swipe.canClick()) return
@@ -214,9 +256,13 @@ export default {
     this.persist({ flash: this.flash })
   },
   beat(index, duration) {
-    this.currentBeat = index
-    this.clearFlash()
-    if (this.flash) {
+    if (!this.running || !this._visible) return
+    this._lastBeat = index
+    if (!this.dark) {
+      this.currentBeat = index
+      this.clearFlash()
+    }
+    if (this.flash && !this.dark) {
       this.lit = true
       // Even at 250 dotted-quarter BPM, the flash ends before the next eighth.
       this._flashTimer = setTimeout(() => {
@@ -236,7 +282,10 @@ export default {
     this.lit = false
   },
   stop() {
+    this._runGeneration++
+    this.dark = false
     this.running = false
+    this._lastBeat = -1
     if (this._metronome) this._metronome.stop()
     this.currentBeat = -1
     this.clearFlash()
@@ -271,6 +320,8 @@ export default {
 <style>
 .page { width: 100%; height: 100%; }
 .loading { width: 100%; height: 100%; align-items: center; justify-content: center; }
+.dark-screen { width: 100%; height: 100%; padding-bottom: 32px; flex-direction: column; align-items: center; justify-content: flex-end; }
+.dark-hint { width: 280px; height: 24px; color: #515965; font-size: 15px; text-align: center; }
 .practice { width: 100%; height: 100%; padding: 12px 16px; flex-direction: column; align-items: center; justify-content: space-between; }
 .meter { width: 160px; height: 40px; font-size: 26px; text-align: center; }
 .tempo { width: 280px; height: 82px; flex-direction: column; align-items: center; justify-content: center; }

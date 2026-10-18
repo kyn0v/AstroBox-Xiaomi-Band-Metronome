@@ -89,9 +89,7 @@ test('visible template labels exist in both languages and versions/routes are co
   for (const route of Object.keys(manifest.router.pages)) {
     const source = fs.readFileSync(path.join(root, 'src', route, 'index.ux'), 'utf8')
     for (const [, key] of source.split('<script>')[0].matchAll(/labels\.(\w+)/g)) {
-      const strings = route === 'pages/probe' ? require('../src/common/probe-strings').getProbeStrings
-        : route === 'pages/capabilities' ? require('../src/common/capability-strings').getCapabilityStrings : getStrings
-      for (const lang of ['en', 'zh']) assert.equal(typeof strings(lang)[key], 'string', `${route}: ${lang}.${key}`)
+      for (const lang of ['en', 'zh']) assert.equal(typeof getStrings(lang)[key], 'string', `${route}: ${lang}.${key}`)
     }
   }
   for (const lang of ['en', 'zh']) for (const mode of ['long', 'short', 'off']) {

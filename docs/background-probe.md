@@ -1,6 +1,6 @@
-# 后台运行试验（beta.1 引入，beta.2 保留）
+# 后台运行试验（历史记录：beta.1 / beta.2）
 
-**beta.2 的本次测试重点是「配色 → 设备能力检测（只读）」**，请先按 [只读检测说明](capability-check.md) 收集五页结果，不必重复运行本页的振动试验。
+**beta.3 已移除本试验入口，只支持前台练习。** 当前用法见 [前台暗屏说明](foreground-dark.md)。以下内容仅用于理解旧测试包及其结果，不是当前版本的操作指南。
 
 此包用于 [issue #1](https://github.com/kyn0v/astrobox-xiaomi-band-metronome/issues/1) 的小米手环 9 Pro 实机验证。**它不代表已经实现或验证了后台打拍。** 不要求 Root、刷固件、额外定位/音频权限或修改系统。
 

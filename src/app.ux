@@ -1,29 +1,11 @@
 <script>
 const storage = require('@system.storage')
-const vibrator = require('@system.vibrator')
-const brightness = require('@system.brightness')
 const { createPreferenceStore } = require('./common/preferences')
-const { createBackgroundProbe } = require('./common/background-probe')
 
 export default {
   getPreferences() {
     if (!this._preferences) this._preferences = createPreferenceStore(storage)
     return this._preferences
-  },
-  getBackgroundProbe() {
-    if (!this._backgroundProbe) {
-      this._backgroundProbe = createBackgroundProbe({
-        clock: { now: () => Date.now(), setTimeout: (fn, ms) => setTimeout(fn, ms), clearTimeout: id => clearTimeout(id) },
-        storage,
-        vibrate: mode => vibrator.vibrate({ mode }),
-        keepScreenOn: (value, fail) => brightness.setKeepScreenOn({ keepScreenOn: value, fail })
-      })
-    }
-    return this._backgroundProbe
-  },
-  stopBackgroundProbe() { if (this._backgroundProbe) this._backgroundProbe.stop('home') },
-  onShow() { if (this._backgroundProbe) this._backgroundProbe.setAppVisible(true) },
-  onHide() { if (this._backgroundProbe) this._backgroundProbe.setAppVisible(false) },
-  onDestroy() { if (this._backgroundProbe) this._backgroundProbe.destroy() }
+  }
 }
 </script>

@@ -1,7 +1,9 @@
 // Follow the device locale; unsupported languages fall back to English.
 const en = {
   title: 'METRONOME', tempo: 'TEMPO', rhythm: 'RHYTHM', appearance: 'COLORS',
-  backgroundProbe: 'Background test (beta)', capabilities: 'Device capabilities',
+  darkWake: 'Foreground dark · tap to restore', darkExit: 'Swipe right: stop and exit',
+  darkStartFirst: 'Start playback before dark mode', darkVibrationFirst: 'Enable vibration for dark mode',
+  darkBeatFirst: 'Set a vibrating beat first',
   start: 'Start', stop: 'Stop', tap: 'Tap Tempo',
   tapRange: 'Use 50–250 BPM',
   tempoMinimum: 'Minimum: 50 BPM', tempoMaximum: 'Maximum: 250 BPM',
@@ -28,7 +30,9 @@ const en = {
 
 const zh = {
   title: '节拍器', tempo: '调整速度', rhythm: '节拍编排', appearance: '主题配色',
-  backgroundProbe: '后台试验（测试版）', capabilities: '设备能力检测（只读）',
+  darkWake: '前台暗屏 · 点击恢复', darkExit: '右滑停止并退出',
+  darkStartFirst: '开始播放后可进入暗屏', darkVibrationFirst: '请先开启振动',
+  darkBeatFirst: '请先设置有振动的拍位',
   start: '开始', stop: '停止', tap: '击拍测速',
   tapRange: '请使用 50–250 BPM',
   tempoMinimum: '最低 50 BPM', tempoMaximum: '最高 250 BPM',
