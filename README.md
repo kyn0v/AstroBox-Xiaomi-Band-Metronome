@@ -29,7 +29,7 @@
 
 ## 安装与限制
 
-当前源码为 **0.6.0-beta.1**，用于 [后台运行需求 #1](https://github.com/kyn0v/astrobox-xiaomi-band-metronome/issues/1) 的实机验证，尚未确认支持后台持续打拍。此前 0.5.11 的 [AstroBox PR #1156](https://github.com/AstralSightStudios/AstroBox-Repo/pull/1156) 已合并；这个测试包不代表商店版本已更新。
+当前源码为 **0.6.0-beta.2**，新增只读设备能力检测，用于 [后台运行需求 #1](https://github.com/kyn0v/astrobox-xiaomi-band-metronome/issues/1) 的实机验证，尚未确认支持后台持续打拍。此前 0.5.11 的 [AstroBox PR #1156](https://github.com/AstralSightStudios/AstroBox-Repo/pull/1156) 已合并；这个测试包不代表商店版本已更新。
 
 本仓库的 `source` 分支保存源码，[`main`](https://github.com/kyn0v/astrobox-xiaomi-band-metronome/tree/main) 分支由 CreatorConsole 管理安装包和商店图片。
 
@@ -38,6 +38,24 @@
 - 长振动表示时间较长，不代表力度更强。高速或 6/8 下可能连震，已开始的振动无法立即截断。建议先低速测试。
 - 自动化测试不能验证实际振动时序、触摸响应和耗电，仍需真机测试。
 - 0.5.5 更换了包名，从此前版本迁移时会安装为新应用，需要重新填写设置。
+
+## 设备能力检测（beta.2，本次测试重点）
+
+首页下滑进入配色 → 点击「**设备能力检测（只读）**」。页面会自动读取一次，通常在 3 秒内结束；用「上一页／下一页」查看五组结果：
+
+1. 型号、设备代号、系统版本、设备返回的 API Level。
+2. 运行时版本/版本号、系统版本号和应用版本。
+3. 振动接口的能力查询结果。
+4. 音频、定位、下载和事件接口的查询结果。
+5. 未公开的 timer/alarm/notification 候选名称，仅查询，不导入或执行。
+
+- 点击数值可查看长值详情；「重新检测」可以重试。结果仅在当前页面实例内存中保留，不写入存储或上传。
+- 「无法查询」和「查询异常」**不是**「不支持」；「报告支持」也**不是**后台可运行的证明。
+- 设备没有返回 API Level 时显示「未返回」，不会用 manifest 的最低 API 要求冒充实机能力。
+- 只调用 `app.getInfo`、`app.canIUse`（若存在）和 `device.getInfo`，不读取唯一设备 ID、序列号或账号。
+- 不启动振动、音频、定位、下载、动态库或后台服务。检测入口会先停止遗留的振动试验。
+
+建议发回五页截图；详见 [只读检测说明](docs/capability-check.md)。原有前台节拍器与以下后台试验入口仍保留，但本次不必再跑后台振动试验。
 
 ## 后台运行试验（测试版）
 
@@ -63,7 +81,7 @@ npm test
 npm run build
 ```
 
-输出文件：`dist/org.bandmetronome.app.debug.0.6.0-beta.1.rpk`。
+输出文件：`dist/org.bandmetronome.app.debug.0.6.0-beta.2.rpk`。
 
 当前构建使用工具链公共调试签名，不是正式发行包。签名、测试和发布流程见 [开发说明（英文）](docs/development.md)。
 

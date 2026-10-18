@@ -1,0 +1,167 @@
+{
+  "scope": "Research evidence index; no retail firmware or device capability claim",
+  "checkedAt": "2026-10-18T08:28:06.815222+00:00",
+  "officialPages": [
+    {
+      "id": "background",
+      "url": "https://iot.mi.com/vela/quickapp/zh/guide/framework/other/background-running.html",
+      "title": "后台运行 | Xiaomi Vela JS 应用",
+      "sha256": "e9915fdf01efd488afc83edf24b5ea6b2196b330128c7b9c9e8a1814c4db76d4",
+      "bytes": 38439
+    },
+    {
+      "id": "lifecycle",
+      "url": "https://iot.mi.com/vela/quickapp/zh/guide/framework/script/lifecycle.html",
+      "title": "生命周期 | Xiaomi Vela JS 应用",
+      "sha256": "86edfe346d41a644a96caa91eacb80e73b816f9ae14f572de63c4006aefe7017",
+      "bytes": 59408
+    },
+    {
+      "id": "vibrator",
+      "url": "https://iot.mi.com/vela/quickapp/zh/features/system/vibrator.html",
+      "title": "振动 vibrator | Xiaomi Vela JS 应用",
+      "sha256": "0dda29791fe818c54fa0ba56e3846b6879a79c9420f25b37d9d9726d2aec04fc",
+      "bytes": 45474
+    },
+    {
+      "id": "app",
+      "url": "https://iot.mi.com/vela/quickapp/zh/features/basic/app.html",
+      "title": "应用上下文 app | Xiaomi Vela JS 应用",
+      "sha256": "7c575e86dac1302e2d1bc802d6123ae7563d77b15033527930f01591e9379bc0",
+      "bytes": 47759
+    },
+    {
+      "id": "device",
+      "url": "https://iot.mi.com/vela/quickapp/zh/features/basic/device.html",
+      "title": "设备信息 device | Xiaomi Vela JS 应用",
+      "sha256": "2f0bdea4d0a3fc279b748a94cdb069668db895b247754baeb28f5b4cf5e95a9a",
+      "bytes": 55119
+    },
+    {
+      "id": "brightness",
+      "url": "https://iot.mi.com/vela/quickapp/zh/features/system/brightness.html",
+      "title": "屏幕亮度 brightness | Xiaomi Vela JS 应用",
+      "sha256": "ebedcd313e6c411ac9bb29b213516dc801722313deb211647aff033339c15b14",
+      "bytes": 51245
+    },
+    {
+      "id": "event",
+      "url": "https://iot.mi.com/vela/quickapp/zh/features/system/event.html",
+      "title": "事件 event | Xiaomi Vela JS 应用",
+      "sha256": "95d6ef868eca6b84e416fc0beb25a15478b17d1a74bdb9d68c91ba0ca4fe9e13",
+      "bytes": 45513
+    },
+    {
+      "id": "audio",
+      "url": "https://iot.mi.com/vela/quickapp/zh/features/other/audio.html",
+      "title": "音频 audio | Xiaomi Vela JS 应用",
+      "sha256": "55f8576aa42d8ad5921fd5b0e10421111cf8f184a0b4cd52571917a8e8993dca",
+      "bytes": 47245
+    },
+    {
+      "id": "geolocation",
+      "url": "https://iot.mi.com/vela/quickapp/zh/features/system/geolocation.html",
+      "title": "地理位置 geolocation | Xiaomi Vela JS 应用",
+      "sha256": "355918f0e78d7c830117ce57651d4789582093a69bab5bdad9bcd5f8f78f6a77",
+      "bytes": 49808
+    },
+    {
+      "id": "request",
+      "url": "https://iot.mi.com/vela/quickapp/zh/features/network/request.html",
+      "title": "下载 request | Xiaomi Vela JS 应用",
+      "sha256": "94e4ff70a4601ebd4b55f7b8348972e4539f89260764af941ae1b11afa2ad030",
+      "bytes": 44416
+    },
+    {
+      "id": "manifest",
+      "url": "https://iot.mi.com/vela/quickapp/zh/guide/framework/manifest.html",
+      "title": "项目配置 | Xiaomi Vela JS 应用",
+      "sha256": "10d50f85ef265fd1d0b2ea452263c83e6e053f4cff9663684e9e58cad59a37ad",
+      "bytes": 47211
+    },
+    {
+      "id": "faq",
+      "url": "https://iot.mi.com/vela/quickapp/zh/guide/other/faq.html",
+      "title": "常见问题 | Xiaomi Vela JS 应用",
+      "sha256": "63a8678028ee4ada992c402138771b99383c4835652aca7c44586431560a2898",
+      "bytes": 42781
+    }
+  ],
+  "upstreamTrees": [
+    {
+      "repository": "open-vela/frameworks_system_vibrator",
+      "commit": "47542f53a97476ec7a036366075e073158f002e6",
+      "truncated": false,
+      "entries": 34
+    },
+    {
+      "repository": "open-vela/frameworks_runtimes_quickapp",
+      "commit": "58af216ec93b13f572aacb3e41b8e39a130056bf",
+      "truncated": false,
+      "entries": 81
+    },
+    {
+      "repository": "open-vela/docs",
+      "commit": "ef76237d468708be054b4c066d00fabf64ae4220",
+      "truncated": false,
+      "entries": 1898
+    },
+    {
+      "repository": "open-vela/packages_apps",
+      "commit": "66be7f4b5ca3c68064640dea19c5dcf5ff137b23",
+      "truncated": false,
+      "entries": 803
+    },
+    {
+      "repository": "open-vela/frameworks_system_utils",
+      "commit": "cff93bf9ad762ab964a075cccaae55e89fa7be0e",
+      "truncated": false,
+      "entries": 84
+    },
+    {
+      "repository": "open-vela/frameworks_runtimes_services_am",
+      "commit": "0b1774a89b43193095c00a6a78de025f64f0d49f",
+      "truncated": false,
+      "entries": 110
+    }
+  ],
+  "communityLeads": [
+    {
+      "url": "https://www.bandbbs.cn/resources/7675/",
+      "directFetchStatus": 404,
+      "evidence": "Search-index lead only; direct page not obtained; reason for 404 unknown"
+    },
+    {
+      "url": "https://www.bandbbs.cn/resources/7676/",
+      "directFetchStatus": 404,
+      "evidence": "Search-index lead only; direct page not obtained; reason for 404 unknown"
+    },
+    {
+      "url": "https://www.bandbbs.cn/resources/7677/",
+      "directFetchStatus": 404,
+      "evidence": "Search-index lead only; direct page not obtained; reason for 404 unknown"
+    },
+    {
+      "url": "https://www.bandbbs.cn/threads/28295/",
+      "directFetchStatus": 404,
+      "evidence": "Search-index lead only; direct page not obtained; reason for 404 unknown"
+    },
+    {
+      "url": "https://www.bandbbs.cn/resources/7675/reviews",
+      "directFetchStatus": 404,
+      "evidence": "Search-index lead only; direct page not obtained; reason for 404 unknown"
+    }
+  ],
+  "companionProject": {
+    "repository": "FangAiden/Vela-Shell-Bridge",
+    "commit": "99aef67ffffef9e81a540c5dd251f30b7075fd46",
+    "inspected": "README.md only; no device installation or compatibility verification"
+  },
+  "localExperiment": {
+    "version": "0.6.0-beta.1",
+    "sourceCommit": "57f4b19c355972e644a18344f90df344473250d2",
+    "observation": "Owner reports playback stops on leaving, foreground dark mode works",
+    "firmware": null,
+    "rawDiagnosticReportAvailable": false
+  }
+}

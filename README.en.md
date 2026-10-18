@@ -29,7 +29,7 @@ In 6/8, BPM counts dotted quarters. The six slots are grouped 3+3, so a bar last
 
 ## Installation and limitations
 
-Current source is **0.6.0-beta.1**, an on-device diagnostic build for [background-running issue #1](https://github.com/kyn0v/astrobox-xiaomi-band-metronome/issues/1), not confirmed background support. The earlier 0.5.11 [AstroBox PR #1156](https://github.com/AstralSightStudios/AstroBox-Repo/pull/1156) was merged; this beta does not update the store resource.
+Current source is **0.6.0-beta.2**, adding a read-only device capability inventory for [background-running issue #1](https://github.com/kyn0v/astrobox-xiaomi-band-metronome/issues/1), not confirmed background support. The earlier 0.5.11 [AstroBox PR #1156](https://github.com/AstralSightStudios/AstroBox-Repo/pull/1156) was merged; this beta does not update the store resource.
 
 This repository's `source` branch contains code. CreatorConsole manages packages and store images on [`main`](https://github.com/kyn0v/astrobox-xiaomi-band-metronome/tree/main).
 
@@ -38,6 +38,19 @@ This repository's `source` branch contains code. CreatorConsole manages packages
 - Long vibration means longer duration, not greater strength. Pulses may overlap at high tempos or in 6/8, and an active pulse cannot be cut short. Test at a low tempo first.
 - Automated tests cannot verify physical vibration timing, touch response, or battery use. Device testing is still required.
 - Version 0.5.5 changed the package ID. Migrating from an earlier version creates a separate app, so preferences must be entered again.
+
+## Read-only capability check (beta.2)
+
+Swipe down from Home to Colors → **Device capabilities**. It reads once automatically, with a three-second device-info timeout. The five panels show device/firmware, runtime/app, vibration APIs, background-related APIs and explicitly unconfirmed timer/alarm/notification query names.
+
+Tap a value to view details; use **Prev / Next** and **Recheck** as needed. Results stay in page-instance memory only, without storage or upload. See the [test guide](docs/capability-check.md).
+
+- Calls only `app.getInfo`, `app.canIUse` when available, and `device.getInfo`.
+- Does not read unique device IDs, serials or accounts, or start vibration, audio, GPS, downloads, native libraries or background services.
+- Stops a retained diagnostic vibration session before entering this read-only check.
+- Missing/erroring capability queries are **not** interpreted as unsupported; reported support is **not** proof of background execution.
+- Missing API Level is shown as not returned, never replaced with the manifest's minimum API requirement.
+- Existing normal practice and the earlier background experiment remain available; no new background-support claim is made.
 
 ## Background-running diagnostic (beta)
 
@@ -63,7 +76,7 @@ npm test
 npm run build
 ```
 
-Output: `dist/org.bandmetronome.app.debug.0.6.0-beta.1.rpk`.
+Output: `dist/org.bandmetronome.app.debug.0.6.0-beta.2.rpk`.
 
 The current build uses the toolkit's shared debug signing key and is not a production release. See the [development guide](docs/development.md) for signing, testing, and publishing details.
 

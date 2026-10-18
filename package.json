@@ -1,6 +1,6 @@
 {
   "name": "xiaomi-band-metronome",
-  "version": "0.6.0-beta.1",
+  "version": "0.6.0-beta.2",
   "private": true,
   "description": "A minimal foreground vibration metronome for Xiaomi Smart Band 9 Pro.",
   "scripts": {

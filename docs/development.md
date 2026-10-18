@@ -19,8 +19,8 @@ npm test
 npm run build
 ```
 
-Current identity: `org.bandmetronome.app`, version **0.6.0-beta.1**, version code **20** (device-test beta).
-Output: `dist/org.bandmetronome.app.debug.0.6.0-beta.1.rpk`.
+Current identity: `org.bandmetronome.app`, version **0.6.0-beta.2**, version code **21** (device-test beta).
+Output: `dist/org.bandmetronome.app.debug.0.6.0-beta.2.rpk`.
 
 This is a debug **application package, not firmware**, signed with the toolkit's
 shared development key. There are no runtime npm dependencies in the app; npm
@@ -86,6 +86,9 @@ Chinese translations. Update both languages together.
 | `src/common/metronome.js` | Meter-aware beat scheduler |
 | `src/common/background-probe.js` | Opt-in, five-minute app-owned diagnostic session and report |
 | `src/pages/probe/index.ux` | Background probe controls and explicitly foreground dark mode |
+| `src/common/background-capabilities.js` | Read-only, filtered device and API metadata collection |
+| `src/common/capability-view.js` | Five-panel result formatting and long-value display |
+| `src/pages/capabilities/index.ux` | Read-only inventory, pagination, details and cancellation |
 | `src/common/rhythm.js` | Meters and normalized per-meter patterns |
 | `src/common/tap-tempo.js` | Tap estimator, 50–250 BPM |
 | `src/common/preferences.js` | Validation, subscriptions, serialized writes and retry status |
@@ -210,7 +213,35 @@ an asynchronous final write, so incomplete reports must remain inconclusive.
 Dark mode only paints a black foreground page while holding screen-on. It does
 not change hardware brightness or claim to save power. All controls and the
 warning/report vocabulary are localized. Unit tests simulate lifecycle and timer
-behavior, not OS scheduling or motor execution. See the [device-test guide](background-probe.md).
+behavior, not OS scheduling or motor execution. See the [device-test guide](background-probe.md)
+and the [2026-10-18 feasibility research](background-research.md) for the device-specific
+API matrix, pinned native-source evidence, limits of the first device result,
+and the evidence boundaries for capability queries. That collector is now integrated
+in beta.2 as the separate read-only page described below.
+
+## Read-only capability inventory (0.6.0-beta.2)
+
+The new Colors entry opens a normal routed page; it does not use clearTask or
+attempt to leave the app. It first stops any retained diagnostic vibration session.
+The collector calls only app.getInfo, app.canIUse when callable, and device.getInfo.
+The sole new manifest feature is system.device; no identifying permission or
+background feature is added. Known service names and explicitly unconfirmed
+candidate names are queried as strings, not imported or executed.
+
+Device data is allowlisted to model/product, OS and runtime versions/codes, and
+APILevel. Only package/version metadata is retained from app.getInfo. Unique IDs,
+serials, accounts, location data and raw error messages are discarded. Control
+characters are removed; strings exceeding 120 characters are visibly shortened
+with `...`. Numeric failure codes may be displayed. Missing or throwing queries
+remain distinct from a reported false result.
+
+Five fixed panels have at most four rows each. Long values can be opened in a
+larger detail view. Results are held only in page-instance memory, not stored or
+uploaded. A three-second timeout bounds device.getInfo; hide/destroy and back
+navigation cancel pending callbacks. A generation guard rejects stale responses,
+and retained completed results do not get re-read just for pagination or a brief
+hide/show. Normal metronome behavior and the previous experiment are unchanged.
+See the [capability-check guide](capability-check.md) for device acceptance.
 
 ## Persistence and package migration
 
