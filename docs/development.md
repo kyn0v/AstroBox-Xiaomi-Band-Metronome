@@ -19,8 +19,8 @@ npm test
 npm run build
 ```
 
-Current identity: `org.bandmetronome.app`, version **0.6.0-beta.3**, version code **22** (foreground-dark test build).
-Output: `dist/org.bandmetronome.app.debug.0.6.0-beta.3.rpk`.
+Current identity: `org.bandmetronome.app`, version **0.6.0**, version code **23** (release promotion of the owner-accepted beta.3, without functional changes).
+Output: `dist/org.bandmetronome.app.debug.0.6.0.rpk`.
 
 This is a debug **application package, not firmware**, signed with the toolkit's
 shared development key. There are no runtime npm dependencies in the app; npm
@@ -178,7 +178,7 @@ suppressed without changing the scheduler or the saved Flash preference.
 These are application-level choices, not a guarantee about every firmware's
 native gesture arbitration. There are no permanent Exit/Back buttons.
 
-## Foreground dark practice (0.6.0-beta.3)
+## Foreground dark practice (0.6.0; introduced in beta.3)
 
 The bottom action row is Vibration / Moon / Flash, with three equal 64 x 48 px
 hit areas. A theme-colored crescent indicates running/vibration state; a gray

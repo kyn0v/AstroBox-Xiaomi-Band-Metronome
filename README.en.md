@@ -42,7 +42,7 @@ A brief click guard prevents entry/wake taps from activating newly shown control
 
 ## Installation and limitations
 
-Current source is **0.6.0-beta.3**, a manual-test build for foreground dark practice. The earlier 0.5.11 [AstroBox PR #1156](https://github.com/AstralSightStudios/AstroBox-Repo/pull/1156) was merged; this beta does not update the store resource.
+Current version is **0.6.0** (versionCode **23**), promoting the owner-accepted beta.3 without functional changes. The earlier 0.5.11 [AstroBox PR #1156](https://github.com/AstralSightStudios/AstroBox-Repo/pull/1156) was merged; publishing 0.6.0 still requires CreatorConsole submission and review. Building a package does not update the store resource.
 
 Develop on `source`; CreatorConsole manages packages and store images on [`main`](https://github.com/kyn0v/astrobox-xiaomi-band-metronome/tree/main).
 
@@ -62,7 +62,7 @@ npm test
 npm run build
 ```
 
-Output: `dist/org.bandmetronome.app.debug.0.6.0-beta.3.rpk`.
+Output: `dist/org.bandmetronome.app.debug.0.6.0.rpk`.
 
 The local build uses a shared debug key. Manual delivery uses the existing project signing workflow; do not substitute a debug signature for an installed release. See [development and publishing](docs/development.md).
 

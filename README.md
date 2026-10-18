@@ -43,7 +43,7 @@
 
 ## 安装与限制
 
-当前源码为 **0.6.0-beta.3**，用于手动测试前台暗屏。此前 0.5.11 的 [AstroBox PR #1156](https://github.com/AstralSightStudios/AstroBox-Repo/pull/1156) 已合并；这个测试包不代表商店版本已更新。
+当前版本为 **0.6.0**（versionCode **23**），功能与已验收的 0.6.0-beta.3 相同，仅转为正式版本号。此前 0.5.11 的 [AstroBox PR #1156](https://github.com/AstralSightStudios/AstroBox-Repo/pull/1156) 已合并；0.6.0 的商店更新仍需通过 CreatorConsole 提交和审核，生成安装包不代表已经上架。
 
 本仓库的 `source` 分支保存源码，[`main`](https://github.com/kyn0v/astrobox-xiaomi-band-metronome/tree/main) 分支由 CreatorConsole 管理安装包和商店图片。
 
@@ -63,7 +63,7 @@ npm test
 npm run build
 ```
 
-输出文件：`dist/org.bandmetronome.app.debug.0.6.0-beta.3.rpk`。
+输出文件：`dist/org.bandmetronome.app.debug.0.6.0.rpk`。
 
 本地 `npm run build` 使用工具链公共调试签名。手动交付使用原项目签名工作流，不应拿公共调试签名替代现有正式签名。签名、测试和发布流程见 [开发说明（英文）](docs/development.md)。
 
