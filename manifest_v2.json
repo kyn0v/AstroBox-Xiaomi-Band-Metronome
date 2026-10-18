@@ -28,9 +28,9 @@
   ],
   "downloads": {
     "xmb9p": {
-      "version": "0.5.11",
-      "file_name": "downloads/org.bandmetronome.app.release.0.5.11.rpk",
-      "versionCode": 19
+      "version": "0.6.0",
+      "file_name": "downloads/org.bandmetronome.app.release.0.6.0.rpk",
+      "versionCode": 23
     }
   },
   "ext": {}
