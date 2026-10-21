@@ -45,7 +45,7 @@
 
 当前版本为 **0.6.0**（versionCode **23**），功能与已验收的 0.6.0-beta.3 相同，仅转为正式版本号。此前 0.5.11 的 [AstroBox PR #1156](https://github.com/AstralSightStudios/AstroBox-Repo/pull/1156) 已合并；0.6.0 的商店更新仍需通过 CreatorConsole 提交和审核，生成安装包不代表已经上架。
 
-本仓库的 `source` 分支保存源码，[`main`](https://github.com/kyn0v/astrobox-xiaomi-band-metronome/tree/main) 分支由 CreatorConsole 管理安装包和商店图片。
+本仓库的 `source` 分支保存源码，[`main`](https://github.com/kyn0v/AstroBox-Xiaomi-Band-Metronome/tree/main) 分支由 CreatorConsole 管理安装包和商店图片。
 
 - 目标设备为小米手环 9 Pro（336 × 480），其他机型尚未验证。
 - **只支持前台运行**。后台试验和只读能力检测已从当前安装包移除；调研与历史记录见 [后台可行性调研](docs/background-research.md)。
@@ -69,6 +69,6 @@ npm run build
 
 ## 反馈
 
-请在 [Issues](https://github.com/kyn0v/astrobox-xiaomi-band-metronome/issues) 中附上设备型号、固件版本、应用版本和复现步骤。截图或视频请先遮住个人信息。
+请在 [Issues](https://github.com/kyn0v/AstroBox-Xiaomi-Band-Metronome/issues) 中附上设备型号、固件版本、应用版本和复现步骤。截图或视频请先遮住个人信息。
 
 本项目不是小米或 AstroBox 官方应用。

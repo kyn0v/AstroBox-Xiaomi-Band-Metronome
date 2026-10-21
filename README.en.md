@@ -44,7 +44,7 @@ A brief click guard prevents entry/wake taps from activating newly shown control
 
 Current version is **0.6.0** (versionCode **23**), promoting the owner-accepted beta.3 without functional changes. The earlier 0.5.11 [AstroBox PR #1156](https://github.com/AstralSightStudios/AstroBox-Repo/pull/1156) was merged; publishing 0.6.0 still requires CreatorConsole submission and review. Building a package does not update the store resource.
 
-Develop on `source`; CreatorConsole manages packages and store images on [`main`](https://github.com/kyn0v/astrobox-xiaomi-band-metronome/tree/main).
+Develop on `source`; CreatorConsole manages packages and store images on [`main`](https://github.com/kyn0v/AstroBox-Xiaomi-Band-Metronome/tree/main).
 
 - Target: Xiaomi Smart Band 9 Pro (336 × 480); other devices are unverified.
 - **Foreground only.** Background experiments and capability-check screens are removed from the current package. Research and historical findings remain in the [feasibility report](docs/background-research.md).
@@ -68,6 +68,6 @@ The local build uses a shared debug key. Manual delivery uses the existing proje
 
 ## Feedback
 
-Include device model, firmware, app version and reproduction steps in an [issue](https://github.com/kyn0v/astrobox-xiaomi-band-metronome/issues). Redact personal information from screenshots or video.
+Include device model, firmware, app version and reproduction steps in an [issue](https://github.com/kyn0v/AstroBox-Xiaomi-Band-Metronome/issues). Redact personal information from screenshots or video.
 
 This is not an official Xiaomi or AstroBox application.

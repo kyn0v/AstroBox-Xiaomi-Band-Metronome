@@ -37,7 +37,7 @@ emulator. Keep debugger services on a trusted local network.
 
 ## Manual signed release build
 
-In `kyn0v/astrobox-xiaomi-band-metronome`, use GitHub **Actions → Build signed RPK → Run workflow**, selecting **`source`**.
+In `kyn0v/AstroBox-Xiaomi-Band-Metronome`, use GitHub **Actions → Build signed RPK → Run workflow**, selecting **`source`**.
 An identical workflow entry is also kept on the default resource branch `main`
 so GitHub exposes the manual-run UI. Runs dispatched on `main` are skipped;
 select `source`. Keep both workflow copies synchronized when editing the build.
@@ -280,7 +280,7 @@ phone disconnection was not established; watch for recurrence during device test
 
 ## Publishing and privacy
 
-The repository `kyn0v/astrobox-xiaomi-band-metronome` uses `source` for the full
+The repository `kyn0v/AstroBox-Xiaomi-Band-Metronome` uses `source` for the full
 source history and `main` for CreatorConsole-managed RPKs, metadata and images.
 Do not merge these branches. Only the manual build workflow is mirrored to `main`
 for GitHub's workflow discovery. This migration preserves the signing certificate;
