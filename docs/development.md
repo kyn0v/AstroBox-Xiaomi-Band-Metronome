@@ -31,9 +31,89 @@ meter timing, stalls, settings persistence, page initialization, navigation even
 ordering, save retries, and icon transparency. They do not render Vela, verify
 physical motor timing, or control a connected band.
 
-For visual checks, open the project in Xiaomi AIoT-IDE with an appropriate Vela
-simulator. `npm start` exposes the vendor debug command; it does not install an
-emulator. Keep debugger services on a trusted local network.
+Use the local browser preview below for source-derived layout checks without an
+emulator. It does not render Vela. `npm start` exposes the vendor debug command;
+it does not install an emulator. Keep debugger services on a trusted local network.
+
+## Local browser preview
+
+Run this from the source checkout with Node.js 20+:
+
+```bash
+npm run preview
+```
+
+Open the printed `http://127.0.0.1:4173/` URL. Set `PORT` to use another port,
+including `PORT=0` for an automatically assigned port. The server binds only to
+`127.0.0.1`, accepts GET and HEAD, and serves an exact allowlist of preview files
+and local PNG assets. No dependency installation, emulator, build, band connection,
+or RPK is needed. Stop it with Ctrl+C. Restart after source edits, because each run
+serves a fixed set of case payloads and asset bytes.
+
+The index lists 23 static cases. Eight baseline frames cover all four manifest
+routes in Chinese and English. Fifteen additional frames cover onboarding,
+running 6/8, foreground dark mode, six-cell rhythm rows, all theme selections,
+native 173 BPM, Tap Tempo reset, both tempo clamps, loading, and a save error.
+This is a bounded layout catalog, not a Cartesian compatibility matrix.
+Controls inside the application area are inert. Case setup calls real page handlers
+and advances the existing fake clock before rendering; clicking a pictured button
+does not simulate native interaction.
+
+`scripts/preview.cjs` owns one Case registry and runs the actual page scripts through
+`tests/helpers.cjs`. Each Snapshot contains current template-facing bindings and
+BPM-derived picker digits. `selected` is only native initialization state and may
+remain 120 after valid events reach 173. The preview must display 173 in that case.
+A SourceBundle contains the original template and CSS, exact asset URLs, and SHA-256
+hashes of source files, the harness, and preview scripts. A Result records readiness,
+assumptions, provenance, rendered text/control bounds, overflow, and decoded images,
+including CSS backgrounds.
+
+`scripts/preview-browser.js` adapts only the observed `div`, `text`, `input`, `image`,
+and text `picker` constructs, `if`, `for`, `$item`, `tid`, and scalar bindings.
+It validates original tags, attributes, expressions, and CSS before HTML parsing.
+It protects bindings and converts paired Vela images to HTML images before inert
+DOM parsing. Inline styles stay in data attributes until substitution so native
+picker declarations never pass through HTML CSSOM unprotected. Recognized event
+bindings are discarded. Unknown constructs fail
+visibly rather than producing a plausible frame.
+
+The browser-normalization layer uses border-box sizing, flex containers, centered
+text, reset button defaults, and Arial with system fallback. It preserves native
+picker CSS as custom properties before browser CSSOM can discard it. Picker width,
+fonts, and colors come from source; the three-row static picker has an explicitly
+assumed 144px height. Adjacent digits outside the 0–9 range are blank. This is not a
+measurement of native wheel height, scrolling, snapping, or boundary behavior.
+Browser font metrics, flex behavior, and corner geometry are approximations.
+
+### Capture labelled frames
+
+1. Start the server and open `/?case=native-173-en` or another ID from `/catalog.json`.
+2. Await `window.__previewReady`. Require `window.__previewResult.status === 'ready'`.
+   A failed Result or browser error is not a pass. Inspect the visible diagnostic
+   text and `window.__previewResult.rendered`, especially `overflow`, `elements`,
+   `assets`, and `pickerDigits`. The native 173 case must report `173` even though
+   its payload's picker initialization remains stale.
+3. Check text and control bounds, image decoding, CSS backgrounds, and unresolved
+   bindings in the rendered page. Review any overflow entries visually. Browser
+   font differences can affect text fit even when source sizes are unchanged.
+4. Capture `#capture`, not just `#device`, at browser device scale 1. Its exact
+   336 × 480 application area is followed by the visible
+   `Browser simulation / 非真机截图` caption, case ID, and picker assumption.
+   The complete PNG is therefore taller than 480px. Check the resulting PNG's
+   dimensions and caption, then inspect full frames and a contact sheet.
+5. Save PNGs, a catalog copy, and each Result JSON under ignored `artifacts/`.
+   Results include source hashes and assumptions. Do not use these images as
+   unlabelled store screenshots or hardware evidence.
+
+### Device scope
+
+Band 9 Pro has user acceptance. Band 10 Pro preparation uses the known 336 × 480
+screen size; the existing manifest already declares designWidth 336 and the watch
+device type. No evidenced device-specific runtime change is needed for this layout
+preparation. Keep version 0.6.0 and code 23, without a new RPK, signing change, or
+AstroBox device-mapping update. Band 10 Pro installation, native controls, vibration,
+and screen-on behavior remain unverified. Browser preview results do not replace
+the device acceptance checklist below.
 
 ## Manual signed release build
 

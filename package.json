@@ -2,9 +2,10 @@
   "name": "xiaomi-band-metronome",
   "version": "0.6.0",
   "private": true,
-  "description": "A minimal foreground vibration metronome for Xiaomi Smart Band 9 Pro.",
+  "description": "A foreground vibration metronome built with Vela JS.",
   "scripts": {
     "start": "aiot start",
+    "preview": "node scripts/preview.cjs",
     "build": "aiot build",
     "test": "node --test tests/*.test.cjs"
   },
