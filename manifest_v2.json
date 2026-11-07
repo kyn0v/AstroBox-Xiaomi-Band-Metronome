@@ -37,8 +37,8 @@
     "trialDownloads": {
       "xmb10p": {
         "version": "0.6.0",
-        "file_name": "downloads/trial/org.bandmetronome.app.debug.0.6.0.rpk",
-        "versionCode": 23
+        "file_name": "downloads/trial/org.bandmetronome.app.release.0.6.0.rpk",
+        "versionCode": 24
       }
     }
   }
