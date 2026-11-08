@@ -1,6 +1,6 @@
 {
   "package": "org.bandmetronome.app",
-  "name": "Metronome",
+  "name": "手环节拍器",
   "icon": "/common/icon.png",
   "versionName": "0.6.0",
   "versionCode": 23,
