@@ -36,6 +36,11 @@
       "version": "0.6.0",
       "file_name": "downloads/org.bandmetronome.app.release.0.6.0-xmb10p.rpk",
       "versionCode": 23
+    },
+    "xmrw6": {
+      "version": "0.6.0",
+      "file_name": "downloads/org.bandmetronome.app.release.0.6.0-xmrw6.rpk",
+      "versionCode": 23
     }
   },
   "ext": {}
