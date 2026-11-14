@@ -102,4 +102,8 @@ export default {
 .theme { width: 128px; height: 128px; flex-shrink: 0; border-radius: 24px; color: #222222; font-size: 20px; }
 .status { width: 280px; height: 24px; color: #a8b5c5; font-size: 16px; text-align: center; }
 .hint { width: 280px; height: 22px; color: #a8b5c5; font-size: 16px; text-align: center; }
+@media (min-width: 200) and (shape: rect) {
+  .row { height: 112px; }
+  .theme { width: 112px; height: 112px; }
+}
 </style>

@@ -4,7 +4,7 @@ const http = require('node:http')
 const crypto = require('node:crypto')
 const { prepareSource } = require('./preview-browser.js')
 
-/** @typedef {{id: string, locale: string, route: string, options?: object, exercise?: Function, expected: object}} Case */
+/** @typedef {{id: string, locale: string, route: string, watch6?: boolean, options?: object, exercise?: Function, expected: object}} Case */
 /** @typedef {{caseId: string, bindings: object, pickerDigits: string[]}} Snapshot */
 /** @typedef {{filename: string, template: string, style: string, assets: string[], hashes: Object<string, string>}} SourceBundle */
 /** @typedef {{status: 'pending'|'ready'|'failed', caseId: string, diagnostics: string[], assumptions: string[], sourceHashes: Object<string, string>, rendered?: object}} Result */
@@ -12,18 +12,19 @@ const { prepareSource } = require('./preview-browser.js')
 const ROOT = path.join(__dirname, '..')
 const ASSUMPTIONS = [
   'Browser simulation / 非真机截图. Not Vela or hardware compatibility evidence.',
-  '336×480 application area. Browser fonts, flex layout and corners approximate Vela.',
+  '336×480 Band 9 Pro or ~336×400 Watch 6 logical application area. Browser fonts, flex layout and corners approximate Vela.',
   'Native picker is static, with assumed height 144px. Width, fonts and colors come from source.',
   'Controls are inert. Cases run real page handlers and a fake clock before rendering.',
-  'Band 9 Pro is user-accepted. Band 10 Pro is local layout preparation only; hardware is unverified.'
+  'Band 9 Pro is user-accepted. Band 10 Pro and REDMI Watch 6 are layout preparation only; hardware is unverified.'
 ]
 
 /** @type {Case[]} */
-const cases = ['en', 'zh'].flatMap(locale => ['index', 'tempo', 'rhythm', 'appearance'].map(page => ({
-  id: `${page}-${locale}`, locale, route: `pages/${page}`, expected: { ready: true }
-})))
-function edge(id, locale, page, options, exercise, expected) {
-  cases.push({ id, locale, route: `pages/${page}`, options, exercise, expected })
+const cases = ['en', 'zh'].flatMap(locale => ['index', 'tempo', 'rhythm', 'appearance'].flatMap(page => [
+  { id: `${page}-${locale}`, locale, route: `pages/${page}`, expected: { ready: true } },
+  { id: `watch6-${page}-${locale}`, locale, route: `pages/${page}`, watch6: true, expected: { ready: true } }
+]))
+function edge(id, locale, page, options, exercise, expected, watch6 = false) {
+  cases.push({ id, locale, route: `pages/${page}`, options, exercise, expected, watch6 })
 }
 function native173(page) {
   page.onNativePickerChange(page.pickerEntries[1].id, { newValue: '7' })
@@ -61,6 +62,13 @@ edge('clamp-high-en', 'en', 'tempo', { preferences: { bpm: 250 } }, page => {
 }, { bpm: 250 })
 edge('loading-zh', 'zh', 'tempo', { deferLoad: true }, null, { ready: false })
 edge('save-error-en', 'en', 'tempo', { saveFails: true }, native173, { bpm: 173, warning: true })
+edge('watch6-welcome-zh', 'zh', 'index', { preferences: { onboardingDone: false } }, null, { showWelcome: true }, true)
+edge('watch6-rhythm-six-zh', 'zh', 'rhythm', { preferences: { meter: '6/8' } }, null, { meter: '6/8', cellWidth: 84 }, true)
+edge('watch6-dark-en', 'en', 'index', {}, (page, h) => {
+  page.toggleRunning()
+  page.enterDark()
+  h.clock.advance(1500)
+}, { running: true, dark: true }, true)
 
 const sha256 = bytes => crypto.createHash('sha256').update(bytes).digest('hex')
 function sourceFiles(root) {
@@ -121,7 +129,7 @@ function buildCase(id, { root = ROOT } = {}) {
     }
     return {
       case: { id, locale: scenario.locale, route: scenario.route, expected: scenario.expected },
-      snapshot, source, viewport: { width: manifest.config.designWidth, height: 480 },
+      snapshot, source, viewport: { width: manifest.config.designWidth, height: scenario.watch6 ? 400 : 480, wide: !!scenario.watch6 },
       result: { status: 'pending', caseId: id, diagnostics: [], assumptions: ASSUMPTIONS, sourceHashes: hashes }
     }
   } finally {
@@ -144,7 +152,7 @@ body { margin: 24px; background: #e2e8f0; color: #172033; font: 16px system-ui, 
 </style>
 <h1>Band Metronome browser simulation</h1>
 <nav id="catalog" aria-label="Preview cases"></nav>
-<div id="capture" hidden><div id="device" inert></div><div id="caption"><strong>Browser simulation / 非真机截图</strong><span id="case-caption"></span><span>336×480 · Static native picker, assumed 144px height</span></div></div>
+<div id="capture" hidden><div id="device" inert></div><div id="caption"><strong>Browser simulation / 非真机截图</strong><span id="case-caption"></span><span id="geometry-caption">336×480 · Static native picker, assumed 144px height</span></div></div>
 <pre id="diagnostics" role="status">Loading preview catalog...</pre>
 <script src="/preview-browser.js"></script>
 </html>`

@@ -49,7 +49,7 @@ test('bounded catalog covers every manifest route in both languages and executes
   const response = await request('/catalog.json')
   assert.equal(response.status, 200)
   const catalog = JSON.parse(response.bytes)
-  assert.ok(catalog.length >= 16 && catalog.length <= 24, 'eight baseline frames plus eight to sixteen edge layouts')
+  assert.ok(catalog.length >= 30 && catalog.length <= 40, 'band and Watch 6 baselines plus bounded edge layouts')
   assert.equal(new Set(catalog.map(item => item.id)).size, catalog.length)
   const manifest = JSON.parse(fs.readFileSync(path.join(ROOT, 'src/manifest.json')))
   for (const route of Object.keys(manifest.router.pages)) {
@@ -60,7 +60,9 @@ test('bounded catalog covers every manifest route in both languages and executes
       assert.equal(payload.snapshot.bindings.ready, true)
       assert.equal(payload.case.locale, locale)
       assert.equal(payload.source.filename, `src/${route}/index.ux`)
-      assert.deepEqual(payload.viewport, { width: 336, height: 480 })
+      assert.deepEqual(payload.viewport, { width: 336, height: 480, wide: false })
+      const watch = JSON.parse((await request(`/case/watch6-${baseline.id}.json`)).bytes)
+      assert.deepEqual(watch.viewport, { width: 336, height: 400, wide: true })
     }
   }
   for (const item of catalog) {
@@ -70,6 +72,12 @@ test('bounded catalog covers every manifest route in both languages and executes
     assert.ok(payload.result.assumptions.some(value => value.includes('144px')))
   }
   assert.throws(() => buildCase('not-a-case'), /Unknown preview case/)
+  for (const id of ['watch6-welcome-zh', 'watch6-rhythm-six-zh', 'watch6-dark-en']) {
+    assert.equal(buildCase(id).result.status, 'pending')
+  }
+  const watchCss = prepareSource(buildCase('watch6-index-en').source).css
+  assert.match(watchCss, /:host\(\[data-wide="true"\]\) \.primary \{ width: 150px/)
+  assert.match(watchCss, /\.primary \{ width: 192px/)
 })
 
 test('real source and handler state determine digit snapshots, not stale native initialization', () => {
@@ -160,6 +168,7 @@ test('unsupported original constructs are rejected even in hidden branches or un
     { template: original.template.replace('!ready', 'new Something') },
     { template: original.template + '<!-- unsupported comment -->' },
     { style: original.style + '\n@media (width: 336px) { .page { width: 100%; } }' },
+    { style: original.style.replace('(shape: rect)', '(shape: circle)') },
     { style: original.style.replace('width: 64px', 'mystery-size: 64px') },
     { style: original.style.replace('width: 64px', 'width: calc(64px)') },
     { style: original.style + '\n.foo { background-image: url(\'/outside.png\'); }' }

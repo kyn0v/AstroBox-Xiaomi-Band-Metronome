@@ -103,14 +103,23 @@
     if (/[<>]/.test(tail) || stack.length) fail('Unbalanced or unsupported template construct')
     html += tail
     const css = source.style.replace(/\/\*[\s\S]*?\*\//g, '')
-    let end = 0
+    // Only the documented wide rectangular watch query is modeled. Unknown
+    // queries still fail rather than producing a misleading preview.
+    const mediaAt = css.indexOf('@media')
+    const wide = mediaAt < 0 ? null : css.slice(mediaAt).match(/^@media \(min-width: 200\) and \(shape: rect\) \{([\s\S]*)\}\s*$/)
+    if (mediaAt >= 0 && !wide) fail('Unsupported CSS media query')
     let normalizedCss = ''
-    for (const rule of css.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
-      if (css.slice(end, rule.index).trim() || !/^\s*\.[a-z][a-z-]*\s*$/.test(rule[1])) fail(`Unsupported CSS selector: ${rule[1].trim()}`)
-      normalizedCss += `${rule[1]} { ${declarations(rule[2], source.assets)} }\n`
-      end = rule.index + rule[0].length
+    function rules(chunk, prefix = '') {
+      let end = 0
+      for (const rule of chunk.matchAll(/([^{}]+)\{([^{}]*)\}/g)) {
+        if (chunk.slice(end, rule.index).trim() || !/^\s*\.[a-z][a-z-]*\s*$/.test(rule[1])) fail(`Unsupported CSS selector: ${rule[1].trim()}`)
+        normalizedCss += `${prefix}${rule[1].trim()} { ${declarations(rule[2], source.assets)} }\n`
+        end = rule.index + rule[0].length
+      }
+      if (chunk.slice(end).trim()) fail('Unsupported CSS rule')
     }
-    if (css.slice(end).trim()) fail('Unsupported CSS rule')
+    rules(mediaAt < 0 ? css : css.slice(0, mediaAt))
+    if (wide) rules(wide[1], ':host([data-wide="true"]) ')
     return { html, css: normalizedCss, functions }
   }
 
@@ -181,6 +190,7 @@ vela-picker { display: flex; flex-direction: column; height: 144px; overflow: hi
       parent.append(output)
     }
     for (const node of inert.content.childNodes) expand(node, snapshot.bindings, fragment)
+    device.dataset.wide = payload.viewport.wide ? 'true' : 'false'
     const shadow = device.shadowRoot || device.attachShadow({ mode: 'open' })
     shadow.replaceChildren()
     const style = document.createElement('style')
@@ -271,8 +281,13 @@ vela-picker { display: flex; flex-direction: column; height: 144px; overflow: hi
       if (pageFailed) return host.__previewResult
       host.__previewResult = payload.result
       document.getElementById('case-caption').textContent = `${id} · ${payload.case?.route || ''} · ${payload.case?.locale || ''}`
+      const area = document.getElementById('device')
+      area.style.height = `${payload.viewport.height}px`
       document.getElementById('capture').hidden = false
-      const rendered = await mount(document.getElementById('device'), payload)
+      document.getElementById('geometry-caption').textContent = payload.viewport.wide
+        ? 'REDMI Watch 6 · 432×514 physical / ~336×400 logical · Static picker assumed 144px'
+        : 'Band 9 Pro · 336×480 · Static picker assumed 144px'
+      const rendered = await mount(area, payload)
       if (pageFailed) return host.__previewResult
       host.__previewResult = rendered
       diagnostics.textContent = JSON.stringify(host.__previewResult, null, 2)

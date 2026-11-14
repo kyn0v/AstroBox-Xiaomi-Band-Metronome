@@ -50,10 +50,11 @@ and local PNG assets. No dependency installation, emulator, build, band connecti
 or RPK is needed. Stop it with Ctrl+C. Restart after source edits, because each run
 serves a fixed set of case payloads and asset bytes.
 
-The index lists 23 static cases. Eight baseline frames cover all four manifest
-routes in Chinese and English. Fifteen additional frames cover onboarding,
-running 6/8, foreground dark mode, six-cell rhythm rows, all theme selections,
-native 173 BPM, Tap Tempo reset, both tempo clamps, loading, and a save error.
+The index lists 34 static cases. Sixteen baseline frames cover all four manifest
+routes in Chinese and English on Band 9 Pro and REDMI Watch 6. Eighteen additional
+frames cover onboarding, running 6/8, foreground dark mode, six-cell rhythm rows,
+all theme selections, native 173 BPM, Tap Tempo reset, both tempo clamps, loading,
+and a save error, including Watch 6 welcome, 6/8 rhythm and dark-mode cases.
 This is a bounded layout catalog, not a Cartesian compatibility matrix.
 Controls inside the application area are inert. Case setup calls real page handlers
 and advances the existing fake clock before rendering; clicking a pictured button
@@ -96,10 +97,10 @@ Browser font metrics, flex behavior, and corner geometry are approximations.
 3. Check text and control bounds, image decoding, CSS backgrounds, and unresolved
    bindings in the rendered page. Review any overflow entries visually. Browser
    font differences can affect text fit even when source sizes are unchanged.
-4. Capture `#capture`, not just `#device`, at browser device scale 1. Its exact
-   336 × 480 application area is followed by the visible
-   `Browser simulation / 非真机截图` caption, case ID, and picker assumption.
-   The complete PNG is therefore taller than 480px. Check the resulting PNG's
+4. Capture `#capture`, not just `#device`, at browser device scale 1. Its
+   336 × 480 Band 9 Pro area or approximately 336 × 400 logical Watch 6 area is
+   followed by the visible `Browser simulation / 非真机截图` caption, case ID,
+   geometry, and picker assumption. The complete PNG is taller than the area. Check the resulting PNG's
    dimensions and caption, then inspect full frames and a contact sheet.
 5. Save PNGs, a catalog copy, and each Result JSON under ignored `artifacts/`.
    Results include source hashes and assumptions. Do not use these images as
@@ -107,7 +108,15 @@ Browser font metrics, flex behavior, and corner geometry are approximations.
 
 ### Device scope
 
-Band 9 Pro has user acceptance. Band 10 Pro preparation uses the known 336 × 480
+Band 9 Pro has user acceptance. Watch 6 layout preparation targets a 432 × 514
+physical rectangular screen (about 216dp wide). At designWidth 336, its vertical
+layout is about 400px, not the Band 9 Pro's 480px. A documented Vela media query
+`(min-width: 200) and (shape: rect)` applies compact vertical sizes to wider
+rectangular watches without changing the 9 Pro layout or any runtime APIs. The
+browser preview models this query only for explicit Watch 6 cases; it cannot
+prove native control rendering or compatibility. See [Watch 6 checklist](redmi-watch-6.md).
+
+Band 10 Pro preparation uses the known 336 × 480
 screen size; the existing manifest already declares designWidth 336 and the watch
 device type. No evidenced device-specific runtime change is needed for this layout
 preparation. Keep version 0.6.0 and code 23, without a new RPK, signing change, or

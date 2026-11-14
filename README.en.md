@@ -47,7 +47,8 @@ Current version is **0.6.0** (versionCode **23**), promoting the owner-accepted 
 Develop on `source`; CreatorConsole manages packages and store images on [`main`](https://github.com/kyn0v/AstroBox-Xiaomi-Band-Metronome/tree/main).
 
 - Xiaomi Smart Band 9 Pro at 336 × 480 has user acceptance. Band 10 Pro is a local layout-preparation target at the known 336 × 480 size, not verified compatibility.
-- Band 10 Pro installation, native controls, vibration, and screen-on behavior remain unverified on hardware. This preparation reuses 0.6.0 / code 23 without runtime changes or a new RPK.
+- Band 10 Pro installation, native controls, vibration, and screen-on behavior remain unverified on hardware; it is not listed as supported.
+- **REDMI Watch 6 (standard, not Active) layout preparation is in progress** for its approximately 432 × 514 rectangular display. The four pages use shorter vertical layouts while retaining existing foreground beat logic. Only a browser approximation and local debug build have been checked: installation, native picker, vibration, screen-on and timing require real-device acceptance. See the [Watch 6 checklist](docs/redmi-watch-6.md) and [issue #4](https://github.com/kyn0v/AstroBox-Xiaomi-Band-Metronome/issues/4). These source changes are unpublished; a local debug build is not a signed store update.
 - **Foreground only.** Background experiments and capability-check screens are removed from the current package. Research and historical findings remain in the [feasibility report](docs/background-research.md).
 - Long vibration means longer duration, not more force. Fast tempos or 6/8 may merge pulses; an already-started pulse cannot be cut short. Begin testing slowly.
 - Automated tests cannot verify motor timing, native touch rendering or battery use.
@@ -65,7 +66,7 @@ npm run build
 
 Output: `dist/org.bandmetronome.app.debug.0.6.0.rpk`.
 
-For local layout previews without an emulator, run `npm run preview` and open the printed `127.0.0.1` URL. This command uses only Node.js built-ins. It needs no dependency installation or RPK build. Frames use actual page templates, styles, images, and real page state from the test harness in a 336 × 480 application area. Controls are inert. Select states through the case links outside the application. Keep the visible `Browser simulation / 非真机截图` caption in screenshots. The static native-picker approximation assumes a 144px height, not a hardware measurement. See [local browser preview](docs/development.md#local-browser-preview) for cases, capture checks, and limits.
+For local layout previews without an emulator, run `npm run preview` and open the printed `127.0.0.1` URL. This command uses only Node.js built-ins. It needs no dependency installation or RPK build. Frames use actual page templates, styles, images, and real page state from the test harness at 336 × 480 for Band 9 Pro and approximately 336 × 400 logical pixels for Watch 6 (approximately 432 × 514 physical pixels). Controls are inert. Select states through the case links outside the application. Keep the visible `Browser simulation / 非真机截图` caption in screenshots. The static native-picker approximation assumes a 144px height, not a hardware measurement. See [local browser preview](docs/development.md#local-browser-preview) for cases, capture checks, and limits.
 
 The local build uses a shared debug key. Manual delivery uses the existing project signing workflow; do not substitute a debug signature for an installed release. See [development and publishing](docs/development.md).
 

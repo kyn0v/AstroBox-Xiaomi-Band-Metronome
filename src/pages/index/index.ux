@@ -342,4 +342,20 @@ export default {
 .guide { width: 292px; height: 32px; color: #f1f5f9; font-size: 20px; text-align: center; }
 .guide-detail { width: 292px; height: 44px; color: #a8b5c5; font-size: 18px; text-align: center; }
 .welcome-button { width: 260px; height: 48px; border-radius: 24px; color: #222222; font-size: 24px; }
+/* At designWidth 336, the 432×514 REDMI Watch 6 has only ~400px of
+   vertical layout space. Keep the 9 Pro layout unchanged on 168dp screens. */
+@media (min-width: 200) and (shape: rect) {
+  .practice { padding: 10px 16px; }
+  .meter { height: 32px; }
+  .tempo { height: 64px; }
+  .bpm { height: 44px; font-size: 40px; }
+  .unit { height: 20px; }
+  .primary { width: 150px; height: 150px; border-radius: 75px; }
+  .beats { height: 20px; }
+  .quick-row { height: 44px; }
+  .quick { height: 44px; }
+  .hint { height: 20px; }
+  .welcome-subtitle { height: 28px; }
+  .guide-detail { height: 48px; }
+}
 </style>
